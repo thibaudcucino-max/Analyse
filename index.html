@@ -1248,7 +1248,7 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
       <div class="map-toolbar">
         <select id="baseSel" onchange="switchBase(this.value)">
           <option value="clair">Clair</option>
-          <option value="osm">Plan OSM</option>
+          <option value="osm" selected>Plan OSM</option>
           <option value="ign">Plan IGN</option>
           <option value="ortho">Ortho IGN</option>
         </select>
@@ -1396,7 +1396,7 @@ const bases={
   ign:L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/png&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',{maxZoom:19,attribution:'© IGN'}),
   ortho:L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/jpeg&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',{maxZoom:20,attribution:'© IGN'})
 };
-let curBase=bases.clair; curBase.addTo(map);
+let curBase=bases.osm; curBase.addTo(map);
 let addrMarkers=L.layerGroup().addTo(map), mutMarkers=L.layerGroup().addTo(map), radiusRings=L.layerGroup().addTo(map);
 function switchBase(k){ map.removeLayer(curBase); curBase=bases[k]; curBase.addTo(map); }
 map.zoomControl.setPosition('topright');
