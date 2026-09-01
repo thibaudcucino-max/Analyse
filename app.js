@@ -1,8 +1,8 @@
 /* =========================================================
    DVF Analyse — SAS De Mère en Fils MDB
-   Fichier autonome. Charte : graphite/noir mat + or.
+   Fichier autonome. Charte : blanc/crème + olive MDB.
    ========================================================= */
-const INK=[30,33,42], GOLD=[190,158,60], GOLD_DK=[154,127,42];
+const INK=[26,25,23], GOLD=[74,82,64], GOLD_DK=[58,65,50];
 const nf=new Intl.NumberFormat('fr-FR');
 const f0=n=>isFinite(n)?nf.format(Math.round(n)):'—';
 const eur=n=>isFinite(n)?f0(n)+' €':'—';
