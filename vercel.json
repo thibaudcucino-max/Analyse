@@ -4,12 +4,16 @@
     {
       "src": "index.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "api/relay.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "src": "/api/relay",
+      "dest": "/api/relay.js"
     },
     {
       "src": "/(.*)",
@@ -17,3 +21,4 @@
     }
   ]
 }
+
