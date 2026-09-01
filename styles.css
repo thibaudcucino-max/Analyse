@@ -9,18 +9,18 @@
   --bg: #F8F7F4;
   --surface: #FFFFFF;
   --surface-2: #F4F3F0;
-  --border: #E8E6E1;
+  --border: #D8D5CE;
   --border-light: #F0EEE9;
 
   /* Textes */
-  --text: #1A1917;
-  --text-2: #3D3C38;
-  --muted: #8A8880;
+  --text: #0F0E0C;
+  --text-2: #2A2925;
+  --muted: #6B6860;
   --muted-2: #B5B3AD;
 
   /* Accent olive-kaki MDB */
-  --olive: #4A5240;
-  --olive-dk: #3A4132;
+  --olive: #3D4A34;
+  --olive-dk: #2E3827;
   --olive-lt: #5C6652;
   --olive-100: #EEF0EA;
   --olive-200: #D8DDD0;
@@ -46,7 +46,7 @@
   --dep-bg: #F0EDEA;
 
   /* Layout */
-  --sidebar-w: 292px;
+  --sidebar-w: 220px;
   --topbar-h: 56px;
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -147,7 +147,7 @@ input, select, textarea { font-family: inherit; font-size: 13.5px; }
   flex-direction: column;
 }
 .logo {
-  padding: 18px 16px 14px;
+  padding: 10px 12px 8px;
   border-bottom: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
@@ -158,19 +158,19 @@ input, select, textarea { font-family: inherit; font-size: 13.5px; }
 }
 .logo:hover { background: var(--surface-2); }
 .logo .ring {
-  width: 52px; height: 52px;
+  width: 38px; height: 38px;
   border-radius: 50%;
   border: 2px solid var(--olive-200);
   background: var(--olive-100);
-  margin: 0 auto 8px;
+  margin: 0 auto 6px;
   display: flex; align-items: center; justify-content: center;
-  font-weight: 800; color: var(--olive); font-size: 13px;
+  font-weight: 800; color: var(--olive); font-size: 11px;
 }
 .logo .co { font-size: 12px; font-weight: 700; color: var(--text-2); }
 .logo .co b { color: var(--olive); }
 .logo .sub { font-size: 10px; color: var(--muted); margin-top: 2px; letter-spacing: .3px; }
 
-.side-body { padding: 14px 14px 0; flex: 1; }
+.side-body { padding: 8px 10px 0; flex: 1; }
 .side-h {
   display: flex; align-items: center; gap: 6px;
   font-size: 12px; font-weight: 700; color: var(--text);
@@ -180,12 +180,12 @@ input, select, textarea { font-family: inherit; font-size: 13.5px; }
 .side-h svg { width: 13px; height: 13px; stroke: var(--muted); }
 .side-sub { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
 .lbl {
-  font-size: 11px; font-weight: 600; color: var(--muted);
-  margin: 10px 0 4px; display: block;
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  margin: 7px 0 3px; display: block; text-transform: uppercase; letter-spacing: .4px;
 }
 .inp {
   width: 100%;
-  padding: 8px 11px;
+  padding: 6px 9px;
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
@@ -1078,3 +1078,40 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
   .vendus-pdf-btn { width: 100%; }
 }
 @media(prefers-reduced-motion:reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+/* ── Sidebar compacte filtres ── */
+.side-body .acc { margin-top: 6px; }
+.acc-h { padding: 7px 10px; font-size: 11.5px; }
+.acc-b { padding: 0 10px 10px; }
+.two { gap: 5px; }
+.two .inp { flex: 1; font-size: 12px; }
+.slider-wrap { margin-top: 4px; }
+.slider-val { font-size: 11px; margin-bottom: 3px; }
+.side-foot { padding: 8px 10px 10px; }
+.btn { padding: 9px; font-size: 13px; }
+.multi { min-height: 58px; font-size: 12px; }
+.hint { font-size: 10px; }
+.chips { gap: 4px; margin-top: 5px; }
+.chip { font-size: 11px; padding: 2px 7px; }
+
+/* Stat cards contrastes */
+.scard .v { color: var(--olive); font-weight: 900; }
+.scard::before { opacity: 1; height: 4px; }
+.scard:hover { box-shadow: var(--shadow-lg); }
+
+/* Tags plus contrastés */
+.tag.appart { background: #dce6f5; color: #1a3a6e; font-weight: 800; }
+.tag.maison { background: #d3ecde; color: #1a4f33; font-weight: 800; }
+.tag.local { background: #faecd3; color: #6b4010; font-weight: 800; }
+.tag.dep { background: #e5e2de; color: #3a3733; font-weight: 800; }
+
+/* Section bars */
+.goldbar { font-size: 13px; padding: 9px 13px; }
+.darkbar { font-size: 12.5px; padding: 8px 12px; }
+
+/* Thead plus lisible */
+thead th { font-size: 11.5px; font-weight: 700; color: #2A2925 !important; letter-spacing: .2px; }
+
+/* Logo texte compact */
+.logo .co { font-size: 11px; }
+.logo .sub { font-size: 9.5px; }
