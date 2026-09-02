@@ -53,13 +53,13 @@
   --dep-bg: #F0EDEA;
 
   /* Layout */
-  --sidebar-w: 300px;
+  --sidebar-w: 330px;
   --topbar-h: 56px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-pill: 999px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-pill: 6px;
   --shadow-xs: 0 1px 3px rgba(26,25,23,.06);
   --shadow-sm: 0 2px 8px rgba(26,25,23,.08);
   --shadow-md: 0 4px 16px rgba(26,25,23,.10);
@@ -187,9 +187,9 @@ input, select, textarea { font-family: inherit; font-size: 13.5px; }
 .side-h svg { width: 13px; height: 13px; stroke: var(--muted); }
 .side-sub { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
 .lbl {
-  font-size: 9.5px; font-weight: 700; color: var(--muted);
-  margin: 8px 0 4px; display: block;
-  text-transform: uppercase; letter-spacing: .5px;
+  font-size: 9.5px; font-weight: 800; color: var(--text-2);
+  margin: 9px 0 4px; display: block;
+  text-transform: uppercase; letter-spacing: .6px;
 }
 .inp {
   width: 100%;
@@ -241,7 +241,7 @@ input[type=range]::-moz-range-thumb {
 .slider-ends { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-top: 2px; }
 .two { display: flex; align-items: center; gap: 7px; }
 .two .inp { flex: 1; }
-.two span { color: var(--muted); font-size: 12px; flex-shrink: 0; }
+.two span { color: var(--muted-2); font-size: 11px; flex-shrink: 0; }
 .hr { height: 1px; background: var(--border-light); margin: 12px 0; }
 
 .acc {
@@ -1068,7 +1068,7 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
 
 /* ── Responsive ── */
 @media(max-width:900px) {
-  :root { --sidebar-w: 300px; }
+  :root { --sidebar-w: 330px; }
   .dashboard { padding: 16px 18px; }
   .compare-hero, .compare-panel { margin-left: 14px; margin-right: 14px; }
   .enrichment-progress { grid-template-columns: 1fr; }
@@ -1162,15 +1162,15 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
   <aside class="sidebar">
     <div class="logo" onclick="location.reload()" style="cursor:pointer" title="Recharger">
       <div class="ring">MDB</div>
-      <div><div class="co">SAS De Mère en Fils <b>MDB</b></div><div class="sub">Analyse foncière · DVF</div></div>
+      <div><div class="co">SAS De Mère en Fils <b>MDB</b></div><div class="sub"></div></div>
     </div>
 
     <div class="side-body">
-      <div class="side-h">
+      <div class="side-h" style="font-size:10.5px;letter-spacing:.7px;color:var(--text);margin-bottom:6px">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
         Recherche de secteur
       </div>
-      <div class="side-sub">Entrez une ou plusieurs adresses / villes</div>
+      
 
       <div class="field">
         <input class="inp" id="q" type="text" placeholder="Ex : 10 rue de la Paix, Aix-en-Pr…" autocomplete="off">
@@ -1187,9 +1187,9 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
 
       <label class="lbl">Période</label>
       <div class="two">
-        <input class="inp" id="yFrom" type="number" value="2024" min="2014" max="2030">
-        <span>à</span>
-        <input class="inp" id="yTo" type="number" value="2026" min="2014" max="2030">
+        <input class="inp" style="text-align:center" id="yFrom" type="number" value="2024" min="2014" max="2030">
+        <span>–</span>
+        <input class="inp" style="text-align:center" id="yTo" type="number" value="2026" min="2014" max="2030">
       </div>
 
       <div class="hr"></div>
@@ -1206,13 +1206,12 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
             <option value="Local">Local</option>
             <option value="Dépendance">Dépendance</option>
           </select>
-          <div class="hint">Ctrl+Clic pour sélection multiple</div>
 
           <label class="lbl">Nombre de pièces</label>
-          <div class="two"><input class="inp" id="pMin" type="number" placeholder="Min"><span>à</span><input class="inp" id="pMax" type="number" placeholder="Max"></div>
+          <div class="two"><input class="inp" id="pMin" type="number" placeholder="Min"><span>–</span><input class="inp" id="pMax" type="number" placeholder="Max"></div>
 
           <label class="lbl">Surface bâti (m²)</label>
-          <div class="two"><input class="inp" id="sMin" type="number" placeholder="Min"><span>à</span><input class="inp" id="sMax" type="number" placeholder="Max"></div>
+          <div class="two"><input class="inp" id="sMin" type="number" placeholder="Min"><span>–</span><input class="inp" id="sMax" type="number" placeholder="Max"></div>
 
           <label class="lbl">Présence de terrain</label>
           <div class="radios">
@@ -1228,16 +1227,16 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
         <div class="acc-h" onclick="toggleAcc('accFin')"><span class="caret">▼</span> Filtres Financiers</div>
         <div class="acc-b">
           <label class="lbl">Valeur foncière (€)</label>
-          <div class="two"><input class="inp" id="vMin" type="number" placeholder="Min"><span>à</span><input class="inp" id="vMax" type="number" placeholder="Max"></div>
+          <div class="two"><input class="inp" id="vMin" type="number" placeholder="Min"><span>–</span><input class="inp" id="vMax" type="number" placeholder="Max"></div>
           <label class="lbl">Prix au m² (€/m²)</label>
-          <div class="two"><input class="inp" id="ppmMin" type="number" placeholder="Min"><span>à</span><input class="inp" id="ppmMax" type="number" placeholder="Max"></div>
+          <div class="two"><input class="inp" id="ppmMin" type="number" placeholder="Min"><span>–</span><input class="inp" id="ppmMax" type="number" placeholder="Max"></div>
         </div>
       </div>
     </div>
 
     <div class="side-foot">
       <button class="btn" id="btnApply" onclick="apply()">Lancer l’analyse</button>
-      <div class="hint" id="srcInfo" style="text-align:center;margin-top:8px">Aucune donnée chargée.</div>
+      <div class="hint" id="srcInfo" style="text-align:center;margin-top:6px;font-size:9px;color:var(--muted-2)"></div>
     </div>
   </aside>
 
@@ -1300,7 +1299,7 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
       <div class="hint">Fait transiter les requêtes DVF publiques par un relais tiers pour contourner le blocage CORS en test. Décoche-le en production et renseigne ton proxy Vercel ci-dessus.</div>
 
       <label class="plbl" style="margin-top:14px">Bornes €/m² (anti-aberrations)</label>
-      <div class="two"><input class="pinp" id="minEur" type="number" value="10"><span>à</span><input class="pinp" id="maxEur" type="number" value="30000"></div>
+      <div class="two"><input class="pinp" id="minEur" type="number" value="10"><span>–</span><input class="pinp" id="maxEur" type="number" value="30000"></div>
 
       <button class="btn" style="margin-top:16px" onclick="closeSettings()">Fermer</button>
     </div>
@@ -2878,7 +2877,7 @@ function filterBarHtml(){
   return `<div class="qual-filterbar simple-filters">
     <div class="qf qf-wide"><label>DPE</label>${multiChoiceHtml('qfDpe',[...DPE_ORDER.map(x=>[x,x]),['UNKNOWN','Inconnu']],f.dpe)}</div>
     <div class="qf qf-wide"><label>Pièces</label>${multiChoiceHtml('qfPieces',[['1','1'],['2','2'],['3','3'],['4','4'],['5','5'],['6plus','6+'],['UNKNOWN','Inconnu']],f.pieces)}</div>
-    <div class="qf qf-range"><label>Année de construction</label><div class="filter-range"><input id="qfConstructionMin" type="number" min="1700" max="2100" step="1" value="${esc(f.constructionMin||'')}" placeholder="Min" oninput="refreshQualifiedView()"><span>à</span><input id="qfConstructionMax" type="number" min="1700" max="2100" step="1" value="${esc(f.constructionMax||'')}" placeholder="Max" oninput="refreshQualifiedView()"></div></div>
+    <div class="qf qf-range"><label>Année de construction</label><div class="filter-range"><input id="qfConstructionMin" type="number" min="1700" max="2100" step="1" value="${esc(f.constructionMin||'')}" placeholder="Min" oninput="refreshQualifiedView()"><span>–</span><input id="qfConstructionMax" type="number" min="1700" max="2100" step="1" value="${esc(f.constructionMax||'')}" placeholder="Max" oninput="refreshQualifiedView()"></div></div>
     ${showFloor?`<div class="qf"><label>Étage</label><select id="qfFloor" onchange="refreshQualifiedView()"><option value="all" ${f.floor==='all'?'selected':''}>Tous</option><option value="rdc" ${f.floor==='rdc'?'selected':''}>RDC</option><option value="1" ${f.floor==='1'?'selected':''}>1er</option><option value="2plus" ${f.floor==='2plus'?'selected':''}>2e et +</option><option value="unknown" ${f.floor==='unknown'?'selected':''}>Inconnu</option></select></div>`:''}
     <div class="qf"><label>Copropriété</label><select id="qfCopro" onchange="refreshQualifiedView()"><option value="all" ${f.copro==='all'?'selected':''}>Tous</option><option value="yes" ${f.copro==='yes'?'selected':''}>Oui</option><option value="no" ${f.copro==='no'?'selected':''}>Non détectée</option><option value="unknown" ${f.copro==='unknown'?'selected':''}>Inconnu</option></select></div>
     <div class="qf"><label>Terrain</label><select id="qfTerrain" onchange="refreshQualifiedView()"><option value="all" ${f.terrain==='all'?'selected':''}>Tous</option><option value="yes" ${f.terrain==='yes'?'selected':''}>Avec terrain</option><option value="no" ${f.terrain==='no'?'selected':''}>Sans terrain</option></select></div>
@@ -3177,7 +3176,7 @@ function exportPdf(){
   const{jsPDF}=window.jspdf;const doc=new jsPDF('p','mm','a4');const W=doc.internal.pageSize.getWidth();
   doc.setFillColor(...INK);doc.rect(0,0,W,26,'F');doc.setFillColor(...GOLD);doc.rect(0,26,W,1.4,'F');
   doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(14);doc.text('SAS De Mère en Fils MDB',14,12);
-  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(200,200,200);doc.text('Analyse foncière · DVF · Étude de secteur',14,18);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(200,200,200);doc.text(' · Étude de secteur',14,18);
   doc.setFontSize(8);doc.text('SIREN 990 726 432 · Saint-Maur-des-Fossés',W-14,12,{align:'right'});doc.text(new Date().toLocaleDateString('fr-FR'),W-14,18,{align:'right'});
   let y=36;doc.setTextColor(...INK);doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text('Secteur',14,y);
   doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(60,60,60);
@@ -3219,12 +3218,12 @@ async function setDefaultSector(){
     const j=await r.json(); const f=j.features&&j.features[0];
     if(f){ if(state.addresses.length)return; const [lon,lat]=f.geometry.coordinates;
       addAddress(f.properties.label,lat,lon,f.properties.citycode,f.properties.id||''); map.setView([lat,lon],16);
-      setStatus('Secteur par défaut : '+f.properties.label,'ok'); return; }
+      setStatus(''+f.properties.label,'ok'); return; }
     throw new Error('no result');
   }catch(e){
     if(state.addresses.length)return;
     addAddress(HOME.label, HOME.lat, HOME.lon, HOME.insee); map.setView([HOME.lat,HOME.lon],16);
-    setStatus('Secteur par défaut : '+HOME.label,'ok');
+    setStatus(''+HOME.label,'ok');
   }
 }
 
