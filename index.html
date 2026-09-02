@@ -1168,76 +1168,67 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
     </div>
 
     <div class="side-body">
-      <div class="side-h" style="font-size:10.5px;letter-spacing:.7px;color:var(--text);margin-bottom:6px">
+      <div class="side-h" style="font-size:10px;letter-spacing:.7px;color:var(--text);margin-bottom:6px">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
-        Recherche de secteur
+        RECHERCHE DE SECTEUR
       </div>
-      
-
       <div class="field">
         <input class="inp" id="q" type="text" placeholder="Ex : 10 rue de la Paix, Aix-en-Pr…" autocomplete="off">
         <div class="ac" id="ac"></div>
       </div>
       <div class="chips" id="chips"></div>
 
-      <div class="slider-wrap">
-        <label class="lbl">Rayon de recherche</label>
-        <div class="slider-val" id="radiusVal">1,00 km</div>
-        <input type="range" id="radius" min="10" max="5000" step="10" value="1000" oninput="updateRadius()">
-        <div class="slider-ends"><span>10 m</span><span>5 km</span></div>
-      </div>
+      <label class="lbl" style="margin-top:10px">RAYON DE RECHERCHE</label>
+      <div class="slider-val" id="radiusVal" style="font-size:12px;font-weight:800;color:var(--olive);margin-bottom:3px">1,00 km</div>
+      <input type="range" id="radius" min="10" max="5000" step="10" value="1000" oninput="updateRadius()">
+      <div class="slider-ends"><span>10 m</span><span>5 km</span></div>
 
-      <label class="lbl">Période</label>
+      <label class="lbl" style="margin-top:10px">PÉRIODE</label>
       <div class="two">
-        <input class="inp" style="text-align:center" id="yFrom" type="number" value="2024" min="2014" max="2030">
+        <input class="inp" style="text-align:center;font-weight:700" id="yFrom" type="number" value="2024" min="2014" max="2030">
         <span>–</span>
-        <input class="inp" style="text-align:center" id="yTo" type="number" value="2026" min="2014" max="2030">
+        <input class="inp" style="text-align:center;font-weight:700" id="yTo" type="number" value="2026" min="2014" max="2030">
       </div>
 
       <div class="hr"></div>
 
-      <!-- Filtres caractéristiques -->
-      <div class="acc" id="accCarac">
-        <div class="acc-h" onclick="toggleAcc('accCarac')"><span class="caret">▼</span> Filtres Caractéristiques</div>
-        <div class="acc-b">
-          <label class="lbl">Type de bien</label>
-          <select class="multi" id="fType" multiple size="4">
-            <option value="Tous" selected>— Tous —</option>
-            <option value="Maison">Maison</option>
-            <option value="Appartement">Appartement</option>
-            <option value="Local">Local</option>
-            <option value="Dépendance">Dépendance</option>
-          </select>
+      <label class="lbl">TYPE DE BIEN</label>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">
+        <label style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;border:1.5px solid #7D721A;background:#F7F4E6;color:#7D721A;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s" id="pill-Tous"><input type="checkbox" name="fType" value="Tous" checked onchange="updateTypePills(this)" style="display:none">Tous</label>
+        <label style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;border:1.5px solid #E5E4DF;background:#fff;color:#3A3A36;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s" id="pill-Maison"><input type="checkbox" name="fType" value="Maison" onchange="updateTypePills(this)" style="display:none">Maison</label>
+        <label style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;border:1.5px solid #E5E4DF;background:#fff;color:#3A3A36;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s" id="pill-Appartement"><input type="checkbox" name="fType" value="Appartement" onchange="updateTypePills(this)" style="display:none">Appt</label>
+        <label style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;border:1.5px solid #E5E4DF;background:#fff;color:#3A3A36;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s" id="pill-Local"><input type="checkbox" name="fType" value="Local" onchange="updateTypePills(this)" style="display:none">Local</label>
+        <label style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;border:1.5px solid #E5E4DF;background:#fff;color:#3A3A36;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s" id="pill-Dépendance"><input type="checkbox" name="fType" value="Dépendance" onchange="updateTypePills(this)" style="display:none">Dép.</label>
+      </div>
+      <select class="multi" id="fType" multiple size="4" style="display:none">
+        <option value="Tous" selected>— Tous —</option>
+        <option value="Maison">Maison</option>
+        <option value="Appartement">Appartement</option>
+        <option value="Local">Local</option>
+        <option value="Dépendance">Dépendance</option>
+      </select>
 
-          <label class="lbl">Nombre de pièces</label>
-          <div class="two"><input class="inp" id="pMin" type="number" placeholder="Min"><span>–</span><input class="inp" id="pMax" type="number" placeholder="Max"></div>
+      <label class="lbl">NOMBRE DE PIÈCES</label>
+      <div class="two"><input class="inp" id="pMin" type="number" placeholder="Min"><span>–</span><input class="inp" id="pMax" type="number" placeholder="Max"></div>
 
-          <label class="lbl">Surface bâti (m²)</label>
-          <div class="two"><input class="inp" id="sMin" type="number" placeholder="Min"><span>–</span><input class="inp" id="sMax" type="number" placeholder="Max"></div>
+      <label class="lbl">SURFACE BÂTI (m²)</label>
+      <div class="two"><input class="inp" id="sMin" type="number" placeholder="Min"><span>–</span><input class="inp" id="sMax" type="number" placeholder="Max"></div>
 
-          <label class="lbl">Présence de terrain</label>
-          <div class="radios">
-            <label><input type="radio" name="terrain" value="tous" checked> Tous</label>
-            <label><input type="radio" name="terrain" value="oui"> Oui</label>
-            <label><input type="radio" name="terrain" value="non"> Non</label>
-          </div>
-        </div>
+      <label class="lbl">PRÉSENCE DE TERRAIN</label>
+      <div style="display:flex;gap:5px;margin-bottom:8px">
+        <label style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;border:1.5px solid #7D721A;background:#F7F4E6;color:#7D721A;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s" id="terrain-tous"><input type="radio" name="terrain" value="tous" checked onchange="updateTerrainPills()" style="display:none">Tous</label>
+        <label style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;border:1.5px solid #E5E4DF;background:#fff;color:#3A3A36;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s" id="terrain-oui"><input type="radio" name="terrain" value="oui" onchange="updateTerrainPills()" style="display:none">Oui</label>
+        <label style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;border:1.5px solid #E5E4DF;background:#fff;color:#3A3A36;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s" id="terrain-non"><input type="radio" name="terrain" value="non" onchange="updateTerrainPills()" style="display:none">Non</label>
       </div>
 
-      <!-- Filtres financiers -->
-      <div class="acc closed" id="accFin">
-        <div class="acc-h" onclick="toggleAcc('accFin')"><span class="caret">▼</span> Filtres Financiers</div>
-        <div class="acc-b">
-          <label class="lbl">Valeur foncière (€)</label>
-          <div class="two"><input class="inp" id="vMin" type="number" placeholder="Min"><span>–</span><input class="inp" id="vMax" type="number" placeholder="Max"></div>
-          <label class="lbl">Prix au m² (€/m²)</label>
-          <div class="two"><input class="inp" id="ppmMin" type="number" placeholder="Min"><span>–</span><input class="inp" id="ppmMax" type="number" placeholder="Max"></div>
-        </div>
-      </div>
-    </div>
+      <div class="hr"></div>
 
-    <div class="side-foot">
-      <button class="btn" id="btnApply" onclick="apply()">Lancer l’analyse</button>
+      <label class="lbl">VALEUR FONCIÈRE (€)</label>
+      <div class="two"><input class="inp" id="vMin" type="number" placeholder="Min"><span>–</span><input class="inp" id="vMax" type="number" placeholder="Max"></div>
+
+      <label class="lbl">PRIX AU m² (€/m²)</label>
+      <div class="two"><input class="inp" id="ppmMin" type="number" placeholder="Min"><span>–</span><input class="inp" id="ppmMax" type="number" placeholder="Max"></div>
+    </div>onclick="apply()">Lancer l’analyse</button>
       <div class="hint" id="srcInfo" style="text-align:center;margin-top:6px;font-size:9px;color:var(--muted-2)"></div>
     </div>
   </aside>
@@ -3503,6 +3494,34 @@ enrichSimpleDetermination=async function(force=false){
 </script>
 
 <script id="selectionPdfPatch">
+
+function updateTypePills(inp){
+  var val=inp.value;
+  var sel=document.getElementById('fType');
+  if(val==='Tous'){
+    document.querySelectorAll('input[name="fType"]').forEach(function(i){i.checked=(i.value==='Tous');});
+    if(sel){Array.from(sel.options).forEach(function(o){o.selected=(o.value==='Tous');});}
+  } else {
+    var tousInp=document.querySelector('input[name="fType"][value="Tous"]');
+    if(tousInp)tousInp.checked=false;
+    if(sel){Array.from(sel.options).forEach(function(o){if(o.value==='Tous')o.selected=false;if(o.value===val)o.selected=inp.checked;});}
+  }
+  document.querySelectorAll('input[name="fType"]').forEach(function(i){
+    var lbl=i.closest('label');if(!lbl)return;
+    if(i.checked){lbl.style.border='1.5px solid #7D721A';lbl.style.background='#F7F4E6';lbl.style.color='#7D721A';}
+    else{lbl.style.border='1.5px solid #E5E4DF';lbl.style.background='#fff';lbl.style.color='#3A3A36';}
+  });
+}
+function updateTerrainPills(){
+  ['tous','oui','non'].forEach(function(v){
+    var lbl=document.getElementById('terrain-'+v);
+    var inp=document.querySelector('input[name="terrain"][value="'+v+'"]');
+    if(!lbl||!inp)return;
+    if(inp.checked){lbl.style.border='1.5px solid #7D721A';lbl.style.background='#F7F4E6';lbl.style.color='#7D721A';}
+    else{lbl.style.border='1.5px solid #E5E4DF';lbl.style.background='#fff';lbl.style.color='#3A3A36';}
+  });
+}
+
 /* ============================================================
    PATCH - sélection finale + filtres allégés + export PDF
    ============================================================ */
