@@ -479,13 +479,15 @@ input[type=range]::-moz-range-thumb {
 }
 .mini-btn:hover { background: var(--olive-100); border-color: var(--olive-200); color: var(--olive); }
 .tbl-scroll {
-  max-height: 380px;
+  max-height: 520px;
   overflow: auto;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: 8px;
   box-shadow: var(--shadow-xs);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 900px; }
 thead th {
   position: sticky; top: 0;
   background: #ECEAE4;
@@ -501,7 +503,7 @@ thead th {
   letter-spacing: .1px;
 }
 thead th:hover { color: var(--olive); }
-tbody td { padding: 8px 12px; border-bottom: 1px solid var(--border-light); }
+tbody td { padding: 7px 10px; border-bottom: 1px solid var(--border-light); max-width: 220px; }
 tbody tr:hover td { background: var(--surface-2); }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 
@@ -959,7 +961,7 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
 
 /* ── Simple table ── */
 .simple-qual-hero { margin-bottom: 14px; }
-.simple-table-panel { padding: 18px; }
+.simple-table-panel { padding: 14px 18px; }
 .simple-table-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
 .simple-head-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .visible-count {
@@ -980,8 +982,8 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
   transition: var(--transition);
 }
 .simple-filters input:focus { border-color: var(--olive); box-shadow: 0 0 0 3px rgba(74,82,64,.10); }
-.simple-table-wrap { max-height: 600px; }
-.simple-qual-table tbody td { padding-top: 8px; padding-bottom: 8px; }
+.simple-table-wrap { max-height: calc(100vh - 420px); overflow: auto; overscroll-behavior: contain; border: 1px solid var(--border); border-radius: 8px; }
+.simple-qual-table tbody td { padding-top: 7px; padding-bottom: 7px; white-space: nowrap; }
 .simple-qual-table tbody tr:hover td { background: var(--surface-2); }
 
 /* ── PDF / export buttons ── */
@@ -1058,7 +1060,7 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
 .starck { border-radius: var(--radius-sm) !important; }
 .qual-empty { text-align: center; color: var(--muted); padding: 60px 20px; }
 .qual-table { min-width: 2700px !important; }
-.qual-table.simple-qual-table { min-width: 1760px; }
+.qual-table.simple-qual-table { min-width: 1800px; }
 .qsummary { grid-template-columns: repeat(6, 1fr) !important; }
 @media(max-width:1100px) { .qsummary { grid-template-columns: repeat(3,1fr) !important; } }
 @media(max-width:700px) { .qsummary { grid-template-columns: repeat(2,1fr) !important; } }
@@ -1839,8 +1841,8 @@ function renderVendus(){
   <div class="block">
     <div class="darkbar" onclick="toggleCollapse('mutList',this)"><span class="caret">▶</span> <span id="mutLabel">Liste des mutations (${S.length} sélectionnées / ${state.filtered.length} total)</span></div>
     <div class="collapse closed" id="mutList">
-      <div class="tbl-head" style="margin-top:12px">
-        <button class="mini-btn" id="selBtn" onclick="toggleAll()">${S.length===state.filtered.length?'Tout désélectionner':'Tout sélectionner'} (${S.length} / ${state.filtered.length})</button>
+      <div class="tbl-head" style="margin-top:10px;display:flex;align-items:center;gap:10px">
+        <button id="selBtn" onclick="toggleAll()" style="padding:4px 12px;border-radius:6px;border:1.5px solid #E5E4DF;background:#fff;color:#3A3A36;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .12s">${S.length===state.filtered.length?'✕ Tout désélectionner':'✓ Tout sélectionner'} <span style="color:#6B6A65;font-weight:500">(${S.length}/${state.filtered.length})</span></button>
       </div>
       <div class="tbl-scroll"><table id="mutTable">${mutTableHtml()}</table></div>
     </div>
