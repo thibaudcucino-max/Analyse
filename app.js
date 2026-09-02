@@ -1188,10 +1188,10 @@ function coproCell(r){
   if(c.value===false) return '<span style="color:#A32D2D;font-weight:700">Non</span>';
   return '<span style="color:#6B6A65">—</span>';
 }
-function qualifiedTableHtml(rows){const t=state.qual.target||{};let h=`<thead><tr><th>Retenir</th>${qualHeader('score','Score')}${qualHeader('quality','Qualité')}${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('surfaceGap','Écart surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${qualHeader('floor','Étage')}${qualHeader('copro','Copropriété')}${qualHeader('terrain','Terrain','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('ppm','€/m² brut','num')}<th>Correction travaux</th>${qualHeader('correctedPpm','€/m² corrigé','num')}${qualHeader('medianGap','Écart médiane','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;rows.forEach(r=>{const q=qualityInfo(r.qScore),di=r.dpeInfo,wb=comparableWorkBudget(r),c=totalCorrectionPerM2(r),cp=correctedPpm(r);h+=`<tr class="${r.qSelected?'qkept':''}"><td><input class="starck" type="checkbox" ${r.qSelected?'checked':''} onchange="toggleQualified('${encodeURIComponent(rowKey(r))}')"></td><td><span class="scorepill">${r.qScore}</span><span class="conf">couverture ${r.qCoverage}%</span></td><td><span class="qualitypill ${q[1]}">${q[0]}</span></td><td>${r.date?.slice(0,7)||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${gapHtml(r,t)}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td><td>${floorLabel(di?.floor)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td></td><td>${worksCellHtml(r)}</td><td class="num">${wb.value>0?`<b>${eur(wb.value)}</b><span class="conf">${wb.source==='audit'?'AUDIT ADEME':'saisie manuelle'}</span>`:'—'}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num">${ppmF(r.ppm)}</td><td>${correctionBreakdownHtml(r)}</td><td class="num">${isFinite(cp)?`<span class="corrected-price">${ppmF(cp)}</span>`:'—'}</td><td class="num">${medianGapHtml(r)}</td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;});return h+'</tbody>';}
+function qualifiedTableHtml(rows){const t=state.qual.target||{};let h=`<thead><tr><th>Retenir</th>${qualHeader('score','Score')}${qualHeader('quality','Qualité')}${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('surfaceGap','Écart surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${qualHeader('floor','Étage')}${qualHeader('copro','Copropriété')}${qualHeader('terrain','Terrain','num')}<th>Équipements / extérieurs</th>${qualHeader('works','Travaux / source')}${qualHeader('workBudget','Budget travaux préconisés (audit)','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('ppm','€/m² brut','num')}<th>Correction travaux</th>${qualHeader('correctedPpm','€/m² corrigé','num')}${qualHeader('medianGap','Écart médiane','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;rows.forEach(r=>{const q=qualityInfo(r.qScore),di=r.dpeInfo,wb=comparableWorkBudget(r),c=totalCorrectionPerM2(r),cp=correctedPpm(r);h+=`<tr class="${r.qSelected?'qkept':''}"><td><input class="starck" type="checkbox" ${r.qSelected?'checked':''} onchange="toggleQualified('${encodeURIComponent(rowKey(r))}')"></td><td><span class="scorepill">${r.qScore}</span><span class="conf">couverture ${r.qCoverage}%</span></td><td><span class="qualitypill ${q[1]}">${q[0]}</span></td><td>${r.date?.slice(0,7)||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${gapHtml(r,t)}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td><td>${floorLabel(di?.floor)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td>${freeFeaturesHtml(r)}</td><td>${worksCellHtml(r)}</td><td class="num">${wb.value>0?`<b>${eur(wb.value)}</b><span class="conf">${wb.source==='audit'?'AUDIT ADEME':'saisie manuelle'}</span>`:'—'}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num">${ppmF(r.ppm)}</td><td>${correctionBreakdownHtml(r)}</td><td class="num">${isFinite(cp)?`<span class="corrected-price">${ppmF(cp)}</span>`:'—'}</td><td class="num">${medianGapHtml(r)}</td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;});return h+'</tbody>';}
 function filterBarHtml(){
   const f=normalizeManualFilterState(state.qual.filters||{}),showFloor=shouldShowFloor();
-  const pill=(name,v,l,active)=>`<label style="display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:5px;border:1.5px solid ${active?'#7D721A':'#E5E4DF'};background:${active?'#F7F4E6':'#fff'};color:${active?'#7D721A':'#3A3A36'};font-size:11px;font-weight:700;cursor:pointer;transition:all .12s"><input type="checkbox" name="${name}" value="${v}" ${active?'checked':''} onchange="refreshQualifiedView()" style="display:none">${l}</label>`;
+  const pill=(name,v,l,active)=>`<label style="display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:5px;border:1.5px solid ${active?'#7D721A':'#E5E4DF'};background:${active?'#F7F4E6':'#fff'};color:${active?'#7D721A':'#3A3A36'};font-size:11px;font-weight:700;cursor:pointer"><input type="checkbox" name="${name}" value="${v}" ${active?'checked':''} onchange="refreshQualifiedView()" style="display:none">${l}</label>`;
   const dpeVals=[...DPE_ORDER.map(x=>[x,x]),['UNKNOWN','?']];
   const pieceVals=[['1','1p'],['2','2p'],['3','3p'],['4','4p'],['5','5p'],['6plus','6p+'],['UNKNOWN','?']];
   const dpe=f.dpe||[];const pieces=f.pieces||[];
@@ -1201,13 +1201,13 @@ function filterBarHtml(){
     <span style="color:#E5E4DF;margin:0 4px">|</span>
     <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Pièces</span>
     ${pieceVals.map(([v,l])=>pill('qfPieces',v,l,pieces.includes(v))).join('')}
-    ${showFloor?`<span style="color:#E5E4DF;margin:0 4px">|</span><span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Étage</span><select id="qfFloor" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;font-weight:700;background:#fff;color:#191917"><option value="all" ${f.floor==='all'?'selected':''}>Tous</option><option value="rdc" ${f.floor==='rdc'?'selected':''}>RDC</option><option value="1" ${f.floor==='1'?'selected':''}>1er</option><option value="2plus" ${f.floor==='2plus'?'selected':''}>2e+</option><option value="unknown" ${f.floor==='unknown'?'selected':''}>?</option></select>`:''}
+    ${showFloor?`<span style="color:#E5E4DF;margin:0 4px">|</span><span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Étage</span><select id="qfFloor" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;background:#fff"><option value="all" ${f.floor==='all'?'selected':''}>Tous</option><option value="rdc" ${f.floor==='rdc'?'selected':''}>RDC</option><option value="1" ${f.floor==='1'?'selected':''}>1er</option><option value="2plus" ${f.floor==='2plus'?'selected':''}>2e+</option><option value="unknown" ${f.floor==='unknown'?'selected':''}>?</option></select>`:''}
     <span style="color:#E5E4DF;margin:0 4px">|</span>
     <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Copro</span>
-    <select id="qfCopro" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;font-weight:700;background:#fff;color:#191917"><option value="all" ${f.copro==='all'?'selected':''}>Tous</option><option value="yes" ${f.copro==='yes'?'selected':''}>Oui</option><option value="no" ${f.copro==='no'?'selected':''}>Non</option><option value="unknown" ${f.copro==='unknown'?'selected':''}>?</option></select>
+    <select id="qfCopro" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;background:#fff"><option value="all" ${f.copro==='all'?'selected':''}>Tous</option><option value="yes" ${f.copro==='yes'?'selected':''}>Oui</option><option value="no" ${f.copro==='no'?'selected':''}>Non</option><option value="unknown" ${f.copro==='unknown'?'selected':''}>?</option></select>
     <span style="color:#E5E4DF;margin:0 4px">|</span>
     <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Terrain</span>
-    <select id="qfTerrain" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;font-weight:700;background:#fff;color:#191917"><option value="all" ${f.terrain==='all'?'selected':''}>Tous</option><option value="yes" ${f.terrain==='yes'?'selected':''}>Avec</option><option value="no" ${f.terrain==='no'?'selected':''}>Sans</option></select>
+    <select id="qfTerrain" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;background:#fff"><option value="all" ${f.terrain==='all'?'selected':''}>Tous</option><option value="yes" ${f.terrain==='yes'?'selected':''}>Avec</option><option value="no" ${f.terrain==='no'?'selected':''}>Sans</option></select>
     <button onclick="resetQualifiedFilters()" style="margin-left:6px;padding:3px 10px;border:1.5px solid #E5E4DF;border-radius:5px;background:#fff;font-size:11px;font-weight:700;color:#6B6A65;cursor:pointer">↺</button>
   </div>`;
 }
@@ -1355,15 +1355,15 @@ function qualifiedFilteredRows(applySort=true){
 }
 
 function qualifiedTableHtml(rows){
-  let h=`<thead><tr>${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${qualHeader('floor','Étage')}${qualHeader('copro','Copropriété')}${qualHeader('terrain','Terrain','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('ppm','€/m²','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;
-  rows.forEach(r=>{const di=r.dpeInfo,b=simpleWorkBudget(r);h+=`<tr><td>${r.date?.slice(0,7)||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td><td>${floorLabel(di?.floor)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td class="num">${isFinite(b.value)&&b.value>0?`<b>${eur(b.value)}</b><span class="conf">${b.source==='audit'?'travaux énergétiques préconisés · audit certain':'saisie manuelle'}</span>`:(b.source==='audit_unconfirmed'?`<span class="conf low"><b>À confirmer</b><br>audit non suffisamment rapproché</span>`:'—')}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;});
+  let h=`<thead><tr>${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${qualHeader('floor','Étage')}${qualHeader('copro','Copropriété')}${qualHeader('terrain','Terrain','num')}<th>Équipements / extérieurs</th>${qualHeader('works','Travaux / source')}${qualHeader('workBudget','Budget travaux préconisés (audit)','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('ppm','€/m²','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;
+  rows.forEach(r=>{const di=r.dpeInfo,b=simpleWorkBudget(r);h+=`<tr><td>${r.date?.slice(0,7)||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td><td>${floorLabel(di?.floor)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td>${freeFeaturesHtml(r)}</td><td>${simpleWorksCellHtml(r)}</td><td class="num">${isFinite(b.value)&&b.value>0?`<b>${eur(b.value)}</b><span class="conf">${b.source==='audit'?'travaux énergétiques préconisés · audit certain':'saisie manuelle'}</span>`:(b.source==='audit_unconfirmed'?`<span class="conf low"><b>À confirmer</b><br>audit non suffisamment rapproché</span>`:'—')}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;});
   if(!rows.length)h+=`<tr><td colspan="18" style="padding:28px;text-align:center"><b>Aucune vente ne correspond aux filtres actuels.</b><br><span class="conf" style="display:block;margin-top:6px">Clique « Réinitialiser » pour afficher toutes les ventes de l’analyse.</span></td></tr>`;
   return h+'</tbody>';
 }
 
 function filterBarHtml(){
   const f=normalizeManualFilterState(state.qual.filters||{}),showFloor=shouldShowFloor();
-  const pill=(name,v,l,active)=>`<label style="display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:5px;border:1.5px solid ${active?'#7D721A':'#E5E4DF'};background:${active?'#F7F4E6':'#fff'};color:${active?'#7D721A':'#3A3A36'};font-size:11px;font-weight:700;cursor:pointer;transition:all .12s"><input type="checkbox" name="${name}" value="${v}" ${active?'checked':''} onchange="refreshQualifiedView()" style="display:none">${l}</label>`;
+  const pill=(name,v,l,active)=>`<label style="display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:5px;border:1.5px solid ${active?'#7D721A':'#E5E4DF'};background:${active?'#F7F4E6':'#fff'};color:${active?'#7D721A':'#3A3A36'};font-size:11px;font-weight:700;cursor:pointer"><input type="checkbox" name="${name}" value="${v}" ${active?'checked':''} onchange="refreshQualifiedView()" style="display:none">${l}</label>`;
   const dpeVals=[...DPE_ORDER.map(x=>[x,x]),['UNKNOWN','?']];
   const pieceVals=[['1','1p'],['2','2p'],['3','3p'],['4','4p'],['5','5p'],['6plus','6p+'],['UNKNOWN','?']];
   const dpe=f.dpe||[];const pieces=f.pieces||[];
@@ -1373,13 +1373,13 @@ function filterBarHtml(){
     <span style="color:#E5E4DF;margin:0 4px">|</span>
     <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Pièces</span>
     ${pieceVals.map(([v,l])=>pill('qfPieces',v,l,pieces.includes(v))).join('')}
-    ${showFloor?`<span style="color:#E5E4DF;margin:0 4px">|</span><span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Étage</span><select id="qfFloor" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;font-weight:700;background:#fff;color:#191917"><option value="all" ${f.floor==='all'?'selected':''}>Tous</option><option value="rdc" ${f.floor==='rdc'?'selected':''}>RDC</option><option value="1" ${f.floor==='1'?'selected':''}>1er</option><option value="2plus" ${f.floor==='2plus'?'selected':''}>2e+</option><option value="unknown" ${f.floor==='unknown'?'selected':''}>?</option></select>`:''}
+    ${showFloor?`<span style="color:#E5E4DF;margin:0 4px">|</span><span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Étage</span><select id="qfFloor" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;background:#fff"><option value="all" ${f.floor==='all'?'selected':''}>Tous</option><option value="rdc" ${f.floor==='rdc'?'selected':''}>RDC</option><option value="1" ${f.floor==='1'?'selected':''}>1er</option><option value="2plus" ${f.floor==='2plus'?'selected':''}>2e+</option><option value="unknown" ${f.floor==='unknown'?'selected':''}>?</option></select>`:''}
     <span style="color:#E5E4DF;margin:0 4px">|</span>
     <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Copro</span>
-    <select id="qfCopro" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;font-weight:700;background:#fff;color:#191917"><option value="all" ${f.copro==='all'?'selected':''}>Tous</option><option value="yes" ${f.copro==='yes'?'selected':''}>Oui</option><option value="no" ${f.copro==='no'?'selected':''}>Non</option><option value="unknown" ${f.copro==='unknown'?'selected':''}>?</option></select>
+    <select id="qfCopro" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;background:#fff"><option value="all" ${f.copro==='all'?'selected':''}>Tous</option><option value="yes" ${f.copro==='yes'?'selected':''}>Oui</option><option value="no" ${f.copro==='no'?'selected':''}>Non</option><option value="unknown" ${f.copro==='unknown'?'selected':''}>?</option></select>
     <span style="color:#E5E4DF;margin:0 4px">|</span>
     <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Terrain</span>
-    <select id="qfTerrain" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;font-weight:700;background:#fff;color:#191917"><option value="all" ${f.terrain==='all'?'selected':''}>Tous</option><option value="yes" ${f.terrain==='yes'?'selected':''}>Avec</option><option value="no" ${f.terrain==='no'?'selected':''}>Sans</option></select>
+    <select id="qfTerrain" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;background:#fff"><option value="all" ${f.terrain==='all'?'selected':''}>Tous</option><option value="yes" ${f.terrain==='yes'?'selected':''}>Avec</option><option value="no" ${f.terrain==='no'?'selected':''}>Sans</option></select>
     <button onclick="resetQualifiedFilters()" style="margin-left:6px;padding:3px 10px;border:1.5px solid #E5E4DF;border-radius:5px;background:#fff;font-size:11px;font-weight:700;color:#6B6A65;cursor:pointer">↺</button>
   </div>`;
 }
@@ -1404,7 +1404,814 @@ function renderQualifiedResults(){
   const source=qualifiedSourceRows();if(source.length!==state.qual.rows.length||source.some((r,i)=>rowKey(r)!==rowKey(state.qual.rows[i]))){state.qual.simpleStarted=false;renderQualifiedBase();return;}
   const rows=qualifiedFilteredRows(true),c=simpleEnrichmentCounts();
   body.innerHTML=`<div class="qual-hero simple-qual-hero"><div><h2>Détermination du prix</h2><p>Toutes les ventes issues de l’analyse sont regroupées ici. Trie et filtre les caractéristiques pour retenir mentalement les références les plus pertinentes.</p></div><div class="qual-source">${c.total} VENTES · ${c.dpe} DPE · ${c.public} PUBLIC</div></div>
-  <div class="qual-panel simple-table-panel"><div class="simple-table-head"><div><h3>Tableau des ventes analysées</h3><div class="subtxt">Aucun score ni prix cible automatique : les données DVF restent brutes et les caractéristiques publiques servent uniquement à ton appréciation.</div></div><div class="simple-head-actions"><span id="qualVisibleCount" class="visible-count">${rows.length} / ${state.qual.rows.length} ventes affichées</span><span id="simpleProgress" class="qual-progress"></span><button class="qual-secondary" onclick="enrichSimpleDetermination(true)">Actualiser depuis les sources</button></div></div><div id="simpleGlobalPrice">${simpleGlobalPriceHtml(rows)}</div>${filterBarHtml()}<div class="qual-table-wrap simple-table-wrap"><table class="qual-table simple-qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div>`;
+  <div class="qual-panel simple-table-panel"><div class="simple-table-head"><div><h3>Tableau des ventes analysées</h3><div class="subtxt">Aucun score ni prix cible automatique : les données DVF restent brutes et les caractéristiques publiques servent uniquement à ton appréciation.</div></div><div class="simple-head-actions"><span id="qualVisibleCount" class="visible-count">${rows.length} / ${state.qual.rows.length} ventes affichées</span><span id="simpleProgress" class="qual-progress"></span><button class="qual-secondary" onclick="enrichSimpleDetermination(true)">Actualiser depuis les sources</button></div></div><div id="simpleGlobalPrice">${simpleGlobalPriceHtml(rows)}</div>${filterBarHtml()}<div class="qual-table-wrap simple-table-wrap"><table class="qual-table simple-qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div><div class="qual-warn"><b>Données stabilisées :</b> la copropriété est vérifiée séparément et verrouillée dès qu’une immatriculation fiable est confirmée. L’identité du bien est basée sur la mutation DVF + l’adresse, et toutes les parcelles de la mutation sont contrôlées : un changement de parcelle représentative après dédoublonnage ne peut plus déplacer le statut copropriété. Un « Non détectée » n’est retenu qu’après contrôle BDNB concordant par adresse et toutes les parcelles connues. Une copropriété confirmée est mémorisée durablement par mutation/adresse et un simple rafraîchissement ne peut plus la faire disparaître. Un DPE seulement probable ne suffit plus : il doit être confirmé par le RNIC. Les statuts « Non détectée » ne sont jamais verrouillés : en cas de doute ils repassent à « Inconnu ». Les autres enrichissements sont conservés localement pendant 7 jours. « Actualiser depuis les sources » recontrôle les données sans effacer les copropriétés déjà confirmées.</div></div>`;
+  if(state.view==='qualifies'&&!state.qual.simpleStarted&&!state.qual.running){state.qual.simpleStarted=true;setTimeout(()=>enrichSimpleDetermination(false),40);}
+}
+
+
+/* =========================================================
+   MDB — Filtrage manuel + prix médian sélectionné + annulation
+   ========================================================= */
+let enrichmentEpoch=0;
+
+function normalizeManualFilterState(f={}){
+  return {
+    dpe:Array.isArray(f.dpe)?f.dpe:[],
+    pieces:Array.isArray(f.pieces)?f.pieces:[],
+    constructionMin:f.constructionMin||'',
+    constructionMax:f.constructionMax||'',
+    floor:f.floor||'all',
+    copro:f.copro||'all',
+    terrain:f.terrain||'all'
+  };
+}
+function getCheckedValues(name,fallback=[]){
+  const els=[...document.querySelectorAll(`input[name="${name}"]`)];
+  return els.length?els.filter(x=>x.checked).map(x=>x.value):fallback;
+}
+function shouldShowFloor(){
+  return (state.qual.rows||[]).some(r=>r.type==='Appartement');
+}
+function constructionRangeForRow(r){
+  const y=+r?.dpeInfo?.year;
+  if(isFinite(y)&&y>0)return[y,y];
+  const p=r?.dpeInfo?.period;
+  const map={
+    pre1948:[1800,1947],1948_1974:[1948,1974],1975_1988:[1975,1988],
+    1989_2000:[1989,2000],2001_2012:[2001,2012],2013_2020:[2013,2020],post2020:[2021,2200]
+  };
+  return map[p]||[NaN,NaN];
+}
+function constructionInRange(r,min,max){
+  if(!min&&!max)return true;
+  const [lo,hi]=constructionRangeForRow(r);
+  if(!isFinite(lo)||!isFinite(hi))return false;
+  if(min&&hi<min)return false;
+  if(max&&lo>max)return false;
+  return true;
+}
+const PRICE_CONDITIONS=[
+  ['TURNKEY','Clé en main',12],
+  ['VERY_GOOD','Très bon état',7],
+  ['GOOD','Bon état',0],
+  ['REFRESH','À rafraîchir',-5],
+  ['RENOVATE','À rénover',-12],
+  ['HEAVY','Rénovation lourde',-20]
+];
+const PRICE_CONDITION_DEFAULTS=Object.fromEntries(PRICE_CONDITIONS.map(([k,,v])=>[k,v]));
+function ensurePriceConditionState(){
+  if(!state.qual.priceCondition||!Object.prototype.hasOwnProperty.call(PRICE_CONDITION_DEFAULTS,state.qual.priceCondition))state.qual.priceCondition='GOOD';
+  if(!state.qual.conditionAdjustments)state.qual.conditionAdjustments={...PRICE_CONDITION_DEFAULTS};
+  for(const [k,,v] of PRICE_CONDITIONS)if(!isFinite(+state.qual.conditionAdjustments[k]))state.qual.conditionAdjustments[k]=v;
+}
+function priceConditionLabel(k){return PRICE_CONDITIONS.find(x=>x[0]===k)?.[1]||'Bon état';}
+function priceConditionCoef(){ensurePriceConditionState();return Number(state.qual.conditionAdjustments[state.qual.priceCondition]??0);}
+function priceConditionPct(v){v=Number(v)||0;return `${v>0?'+':''}${v.toLocaleString('fr-FR',{maximumFractionDigits:1})} %`;}
+function priceRowIsKept(r){return r.priceSelected!==false;}
+function togglePriceKeep(encoded){
+  const k=decodeURIComponent(encoded),r=(state.qual.rows||[]).find(x=>rowKey(x)===k);
+  if(!r)return;
+  r.priceSelected=!priceRowIsKept(r);
+  refreshQualifiedView();
+}
+function setDisplayedPriceSelection(on){
+  qualifiedFilteredRows(false).forEach(r=>r.priceSelected=!!on);
+  refreshQualifiedView();
+}
+function updateGlobalPriceOutputs(){
+  const st=simpleGlobalPriceStats(qualifiedFilteredRows(true));
+  const main=document.getElementById('sgpMainValue'),base=document.getElementById('sgpBaseValue'),cnt=document.getElementById('sgpSelectedCount'),rppm=document.getElementById('sgpRawPpm'),appm=document.getElementById('sgpAdjustedPpm'),formula=document.getElementById('sgpFormula');
+  if(main)main.textContent=isFinite(st.price)?eur(st.price):'—';
+  if(base)base.textContent=isFinite(st.basePrice)?eur(st.basePrice):'—';
+  if(cnt)cnt.textContent=`${st.kept} bien${st.kept>1?'s':''} gardé${st.kept>1?'s':''}`;
+  if(rppm)rppm.textContent=isFinite(st.rawPpm)?ppmF(st.rawPpm):'—';
+  if(appm)appm.textContent=isFinite(st.adjustedPpm)?ppmF(st.adjustedPpm):'—';
+  if(formula)formula.textContent=isFinite(st.rawPpm)&&isFinite(st.surface)?`${f0(st.surface)} m² × ${ppmF(st.rawPpm)} · ${priceConditionLabel(state.qual.priceCondition)} ${priceConditionPct(st.adj)}`:'Renseigne une surface cible pour calculer le prix global.';
+}
+function setValuationSurface(v){
+  const n=Number(v);state.qual.valuationSurface=isFinite(n)&&n>0?n:NaN;updateGlobalPriceOutputs();
+}
+function setPriceCondition(k){
+  ensurePriceConditionState();if(Object.prototype.hasOwnProperty.call(PRICE_CONDITION_DEFAULTS,k))state.qual.priceCondition=k;
+  const coef=document.getElementById('sgpConditionCoef');if(coef)coef.value=priceConditionCoef();
+  document.querySelectorAll('.sgp-state-chip').forEach(el=>el.classList.toggle('active',el.dataset.condition===state.qual.priceCondition));
+  updateGlobalPriceOutputs();
+}
+function setPriceConditionCoef(v){
+  ensurePriceConditionState();let n=Number(v);if(!isFinite(n))n=0;n=Math.max(-50,Math.min(50,n));
+  state.qual.conditionAdjustments[state.qual.priceCondition]=n;
+  const sel=document.getElementById('sgpCondition');if(sel){const op=sel.querySelector(`option[value="${state.qual.priceCondition}"]`);if(op)op.textContent=`${priceConditionLabel(state.qual.priceCondition)} (${priceConditionPct(n)})`;}
+  updateGlobalPriceOutputs();
+}
+
+function qualifiedFilteredRows(applySort=true){
+  const rows=state.qual.rows||[],f=normalizeManualFilterState(state.qual.filters||{});
+  const dpes=getCheckedValues('qfDpe',f.dpe);
+  const pieces=getCheckedValues('qfPieces',f.pieces);
+  const cMin=+(document.getElementById('qfConstructionMin')?.value||f.constructionMin||0);
+  const cMax=+(document.getElementById('qfConstructionMax')?.value||f.constructionMax||0);
+  const floor=document.getElementById('qfFloor')?.value||f.floor||'all';
+  const copro=document.getElementById('qfCopro')?.value||f.copro||'all';
+  const terrain=document.getElementById('qfTerrain')?.value||f.terrain||'all';
+  const filtered=rows.filter(r=>{
+    if(dpes.length){
+      const d=r.dpeInfo?.dpe||'UNKNOWN';
+      if(!dpes.includes(d))return false;
+    }
+    if(pieces.length){
+      const p=isFinite(r.pieces)?(+r.pieces>=6?'6plus':String(+r.pieces)):'UNKNOWN';
+      if(!pieces.includes(p))return false;
+    }
+    if(!constructionInRange(r,cMin,cMax))return false;
+    if(shouldShowFloor()&&floor!=='all'){
+      const v=r.dpeInfo?.floor;
+      if(floor==='unknown'&&isFinite(v))return false;
+      if(floor!=='unknown'){
+        if(!isFinite(v))return false;
+        if(floor==='rdc'&&+v!==0)return false;
+        if(floor==='1'&&+v!==1)return false;
+        if(floor==='2plus'&&+v<2)return false;
+      }
+    }
+    if(copro!=='all'){
+      const c=publicCoproStatus(r);
+      if(copro==='yes'&&c.value!==true)return false;
+      if(copro==='no'&&c.value!==false)return false;
+      if(copro==='unknown'&&c.value!==null)return false;
+    }
+    if(terrain==='yes'&&!(r.terrain>0))return false;
+    if(terrain==='no'&&r.terrain>0)return false;
+    return true;
+  });
+  return applySort?qualifiedSortRows(filtered):filtered;
+}
+
+function qualifiedTableHtml(rows){
+  const showFloor=shouldShowFloor(),cols=showFloor?19:18;
+  let h=`<thead><tr><th class="keep-head">Garder</th>${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${showFloor?qualHeader('floor','Étage'):''}${qualHeader('copro','Copro')}${qualHeader('terrain','Terrain','num')}<th>Équipements / extérieurs</th>${qualHeader('works','Travaux / source')}${qualHeader('workBudget','Budget travaux préconisés (audit)','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('ppm','€/m²','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;
+  rows.forEach(r=>{
+    const di=r.dpeInfo,b=simpleWorkBudget(r),keep=priceRowIsKept(r);
+    h+=`<tr class="${keep?'price-kept':'price-excluded'}"><td class="keep-head"><input class="price-keep" type="checkbox" ${keep?'checked':''} onchange="togglePriceKeep('${encodeURIComponent(rowKey(r))}')" title="Inclure ce bien dans le Prix global médian"></td><td>${r.date?.slice(0,7)||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td>${showFloor?`<td>${floorLabel(di?.floor)}</td>`:''}<td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td>${freeFeaturesHtml(r)}</td><td>${simpleWorksCellHtml(r)}</td><td class="num">${isFinite(b.value)&&b.value>0?`<b>${eur(b.value)}</b><span class="conf">${b.source==='audit'?'travaux énergétiques préconisés · audit certain':'saisie manuelle'}</span>`:(b.source==='audit_unconfirmed'?`<span class="conf low"><b>À confirmer</b><br>audit non suffisamment rapproché</span>`:'—')}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;
+  });
+  if(!rows.length)h+=`<tr><td colspan="${cols}" style="padding:28px;text-align:center"><b>Aucune vente ne correspond aux filtres actuels.</b><br><span class="conf" style="display:block;margin-top:6px">Clique « Réinitialiser » pour afficher toutes les ventes de l’analyse.</span></td></tr>`;
+  return h+'</tbody>';
+}
+
+function multiChoiceHtml(name,values,current){
+  const cur=Array.isArray(current)?current:[];
+  return `<div class="multi-choice">${values.map(([v,l])=>`<label><input type="checkbox" name="${name}" value="${v}" ${cur.includes(v)?'checked':''} onchange="refreshQualifiedView()"><span>${l}</span></label>`).join('')}</div>`;
+}
+function filterBarHtml(){
+  const f=normalizeManualFilterState(state.qual.filters||{}),showFloor=shouldShowFloor();
+  const pill=(name,v,l,active)=>`<label style="display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:5px;border:1.5px solid ${active?'#7D721A':'#E5E4DF'};background:${active?'#F7F4E6':'#fff'};color:${active?'#7D721A':'#3A3A36'};font-size:11px;font-weight:700;cursor:pointer"><input type="checkbox" name="${name}" value="${v}" ${active?'checked':''} onchange="refreshQualifiedView()" style="display:none">${l}</label>`;
+  const dpeVals=[...DPE_ORDER.map(x=>[x,x]),['UNKNOWN','?']];
+  const pieceVals=[['1','1p'],['2','2p'],['3','3p'],['4','4p'],['5','5p'],['6plus','6p+'],['UNKNOWN','?']];
+  const dpe=f.dpe||[];const pieces=f.pieces||[];
+  return `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 12px;background:#F7F4E6;border:1px solid #E3DCBE;border-radius:8px;margin:8px 0">
+    <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">DPE</span>
+    ${dpeVals.map(([v,l])=>pill('qfDpe',v,l,dpe.includes(v))).join('')}
+    <span style="color:#E5E4DF;margin:0 4px">|</span>
+    <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Pièces</span>
+    ${pieceVals.map(([v,l])=>pill('qfPieces',v,l,pieces.includes(v))).join('')}
+    ${showFloor?`<span style="color:#E5E4DF;margin:0 4px">|</span><span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Étage</span><select id="qfFloor" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;background:#fff"><option value="all" ${f.floor==='all'?'selected':''}>Tous</option><option value="rdc" ${f.floor==='rdc'?'selected':''}>RDC</option><option value="1" ${f.floor==='1'?'selected':''}>1er</option><option value="2plus" ${f.floor==='2plus'?'selected':''}>2e+</option><option value="unknown" ${f.floor==='unknown'?'selected':''}>?</option></select>`:''}
+    <span style="color:#E5E4DF;margin:0 4px">|</span>
+    <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Copro</span>
+    <select id="qfCopro" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;background:#fff"><option value="all" ${f.copro==='all'?'selected':''}>Tous</option><option value="yes" ${f.copro==='yes'?'selected':''}>Oui</option><option value="no" ${f.copro==='no'?'selected':''}>Non</option><option value="unknown" ${f.copro==='unknown'?'selected':''}>?</option></select>
+    <span style="color:#E5E4DF;margin:0 4px">|</span>
+    <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Terrain</span>
+    <select id="qfTerrain" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;background:#fff"><option value="all" ${f.terrain==='all'?'selected':''}>Tous</option><option value="yes" ${f.terrain==='yes'?'selected':''}>Avec</option><option value="no" ${f.terrain==='no'?'selected':''}>Sans</option></select>
+    <button onclick="resetQualifiedFilters()" style="margin-left:6px;padding:3px 10px;border:1.5px solid #E5E4DF;border-radius:5px;background:#fff;font-size:11px;font-weight:700;color:#6B6A65;cursor:pointer">↺</button>
+  </div>`;
+}
+function refreshQualifiedView(){
+  const current=normalizeManualFilterState(state.qual.filters||{});
+  state.qual.filters={
+    dpe:getCheckedValues('qfDpe',current.dpe),
+    pieces:getCheckedValues('qfPieces',current.pieces),
+    constructionMin:document.getElementById('qfConstructionMin')?.value??current.constructionMin,
+    constructionMax:document.getElementById('qfConstructionMax')?.value??current.constructionMax,
+    floor:document.getElementById('qfFloor')?.value||'all',
+    copro:document.getElementById('qfCopro')?.value||'all',
+    terrain:document.getElementById('qfTerrain')?.value||'all'
+  };
+  const rows=qualifiedFilteredRows(true),tbl=document.getElementById('qualTable');
+  if(tbl)tbl.innerHTML=qualifiedTableHtml(rows);
+  const c=document.getElementById('qualVisibleCount');if(c)c.textContent=`${rows.length} / ${state.qual.rows.length} ventes affichées`;
+  const gp=document.getElementById('simpleGlobalPrice');if(gp)gp.innerHTML=simpleGlobalPriceHtml(rows);
+}
+function resetQualifiedFilters(){
+  state.qual.filters={dpe:[],pieces:[],constructionMin:'',constructionMax:'',floor:'all',copro:'all',terrain:'all'};
+  renderQualifiedResults();
+}
+
+function simpleGlobalPriceStats(rows){
+  ensurePriceConditionState();
+  const kept=rows.filter(priceRowIsKept);
+  const ppms=kept.map(r=>r.ppm).filter(v=>isFinite(v)&&v>0);
+  const rawPpm=median(ppms),surface=Number(state.qual.valuationSurface),adj=priceConditionCoef(),factor=1+adj/100;
+  const validSurface=isFinite(surface)&&surface>0?surface:NaN;
+  const basePrice=isFinite(rawPpm)&&isFinite(validSurface)?rawPpm*validSurface:NaN;
+  return{displayed:rows.length,kept:kept.length,rawPpm,surface:validSurface,adj,basePrice,price:isFinite(basePrice)?basePrice*factor:NaN,adjustedPpm:isFinite(rawPpm)?rawPpm*factor:NaN};
+}
+function simpleGlobalPriceHtml(rows){
+  ensurePriceConditionState();
+  const st=simpleGlobalPriceStats(rows),cond=state.qual.priceCondition,coef=priceConditionCoef();
+  const options=PRICE_CONDITIONS.map(([k,l])=>`<option value="${k}" ${k===cond?'selected':''}>${esc(l)} (${priceConditionPct(Number(state.qual.conditionAdjustments[k]))})</option>`).join('');
+  const chips=PRICE_CONDITIONS.map(([k,l])=>`<span class="sgp-state-chip ${k===cond?'active':''}" data-condition="${k}">${esc(l)} ${priceConditionPct(Number(state.qual.conditionAdjustments[k]))}</span>`).join('');
+  return `<div class="simple-global-price-card">
+    <div>
+      <div class="sgp-label">Prix global médian</div>
+      <div class="sgp-value" id="sgpMainValue">${isFinite(st.price)?eur(st.price):'—'}</div>
+      <div class="sgp-subvalue">Prix avant ajustement d’état : <b id="sgpBaseValue">${isFinite(st.basePrice)?eur(st.basePrice):'—'}</b></div>
+      <div class="keep-actions"><button onclick="setDisplayedPriceSelection(true)">✓ Garder tous les biens affichés</button><button onclick="setDisplayedPriceSelection(false)">× Tout retirer</button></div>
+    </div>
+    <div>
+      <div class="sgp-controls">
+        <div class="sgp-control"><label>Surface cible (m²)</label><input id="sgpSurface" type="number" min="1" step="1" value="${isFinite(st.surface)?st.surface:''}" placeholder="Ex : 100" oninput="setValuationSurface(this.value)"></div>
+        <div class="sgp-control"><label>État du bien</label><select id="sgpCondition" onchange="setPriceCondition(this.value)">${options}</select></div>
+        <div class="sgp-control coef"><label>Ajustement (%)</label><div class="sgp-coef-row"><input id="sgpConditionCoef" type="number" min="-50" max="50" step="0.5" value="${coef}" oninput="setPriceConditionCoef(this.value)"><span class="pct">%</span></div></div>
+      </div>
+      <div class="sgp-formula" id="sgpFormula">${isFinite(st.rawPpm)&&isFinite(st.surface)?`${f0(st.surface)} m² × ${ppmF(st.rawPpm)} · ${priceConditionLabel(cond)} ${priceConditionPct(st.adj)}`:'Renseigne une surface cible pour calculer le prix global.'}</div>
+      <div class="sgp-state-scale">${chips}</div>
+    </div>
+    <div class="sgp-meta"><span class="selected-count" id="sgpSelectedCount">${st.kept} bien${st.kept>1?'s':''} gardé${st.kept>1?'s':''}</span> sur ${st.displayed} affiché${st.displayed>1?'s':''}<br>€/m² médian retenu : <b id="sgpRawPpm">${isFinite(st.rawPpm)?ppmF(st.rawPpm):'—'}</b><br>€/m² après état : <b id="sgpAdjustedPpm">${isFinite(st.adjustedPpm)?ppmF(st.adjustedPpm):'—'}</b></div>
+  </div>`;
+}
+
+function coproCell(r){
+  const p=r.publicInfo,c=publicCoproStatus(r);
+  if(c.value===true){
+    const immat=c.immat||p?.immat||'';
+    if(p?.rnic?.procedureFields&&p.rnic.procedureAlert)return`<span class="mutationpill warn">⚠ Copro · signal RNIC</span><span class="conf">${esc(immat)}</span>`;
+    return`<span class="mutationpill simple">✓ Copro confirmée</span><span class="conf">${esc(c.label)}${immat?' · '+esc(immat):''}${isFinite(p?.rnic?.lots)?' · '+f0(p.rnic.lots)+' lots':''}</span>`;
+  }
+  if(c.value===false)return`<span class="mutationpill simple">○ Non détectée</span><span class="conf">${esc(c.label||'BDNB sans immatriculation rapprochée')} · à confirmer</span>`;
+  if(!p?.done)return'<span class="conf">vérification en cours / source indisponible</span>';
+  return`<span class="conf">${esc(c.label||'Inconnu')}</span>`;
+}
+
+function renderQualifiedBase(){
+  const body=document.getElementById('qualBody');if(!body)return;
+  const source=qualifiedSourceRows();
+  if(!source.length){body.innerHTML='<div class="qual-empty">Lance d’abord une analyse DVF. Toutes les ventes issues de cette analyse apparaîtront ensuite ici.</div>';return;}
+  state.qual.rows=[...source];
+  const selectionKey=state.qual.rows.map(stableRowId).sort().join('||');
+  const isNewSelection=state.qual.manualSelectionKey!==selectionKey;
+  if(isNewSelection){
+    state.qual.manualSelectionKey=selectionKey;
+    state.qual.valuationSurface=NaN;
+    state.qual.priceCondition='GOOD';
+    state.qual.conditionAdjustments={...PRICE_CONDITION_DEFAULTS};
+    state.qual.filters={dpe:[],pieces:[],constructionMin:'',constructionMax:'',floor:'all',copro:'all',terrain:'all'};
+  }
+  const profiles=buildMutationProfiles();let restored=0;
+  state.qual.rows.forEach(r=>{
+    if(loadStableRow(r))restored++;
+    r.qMutationProfile=r.id?profiles.get(r.id):null;
+    r.qMutation=classifyMutation(r,profiles);
+    r.qMicro=microLocationInfo(r);
+    if(isNewSelection||typeof r.priceSelected!=='boolean')r.priceSelected=true;
+  });
+  state.qual.snapshotRestored=restored;
+  if(!state.qual.sort||['score','quality','surfaceGap','correctedPpm','stateCoef','medianGap'].includes(state.qual.sort.key))state.qual.sort={key:'date',dir:-1};
+  renderQualifiedResults();
+}
+
+function renderQualifiedResults(){
+  const body=document.getElementById('qualBody');if(!body)return;if(!state.qual.rows.length){renderQualifiedBase();return;}
+  const source=qualifiedSourceRows();
+  if(source.length!==state.qual.rows.length||source.some((r,i)=>rowKey(r)!==rowKey(state.qual.rows[i]))){
+    state.qual.simpleStarted=false;renderQualifiedBase();return;
+  }
+  const rows=qualifiedFilteredRows(true),c=simpleEnrichmentCounts();
+  body.innerHTML=`<div class="qual-hero simple-qual-hero"><div><h2>Détermination du prix</h2><p>Filtre les ventes, puis coche uniquement les biens que tu veux conserver dans le calcul du prix médian.</p></div><div class="qual-source">${c.total} VENTES · ${c.dpe} DPE · ${c.public} PUBLIC</div></div>
+  <div class="qual-panel simple-table-panel"><div class="simple-table-head"><div><h3>Tableau des ventes analysées</h3><div class="subtxt">Le Prix global médian est calculé uniquement sur les ventes affichées que tu laisses cochées dans « Garder ».</div></div><div class="simple-head-actions"><span id="qualVisibleCount" class="visible-count">${rows.length} / ${state.qual.rows.length} ventes affichées</span><span id="simpleProgress" class="qual-progress"></span><button class="qual-secondary" onclick="enrichSimpleDetermination(true)">Actualiser depuis les sources</button></div></div><div id="simpleGlobalPrice">${simpleGlobalPriceHtml(rows)}</div>${filterBarHtml()}<div class="qual-table-wrap simple-table-wrap"><table class="qual-table simple-qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div><div class="qual-warn"><b>Données stabilisées :</b> les enrichissements DPE / BDNB / RNIC / OSM / AUDIT sont réutilisés lorsqu’ils sont déjà fiabilisés. Si tu relances une nouvelle analyse, les recherches de l’analyse précédente sont immédiatement abandonnées et la priorité passe au nouveau jeu de ventes.</div></div>`;
+  if(state.view==='qualifies'&&!state.qual.simpleStarted&&!state.qual.running){state.qual.simpleStarted=true;setTimeout(()=>enrichSimpleDetermination(false),40);}
+}
+
+/* Annulation des enrichissements obsolètes : une nouvelle analyse prend la priorité. */
+async function enrichRowsDpe(rows,progress,guard=()=>true){
+  const groups=new Map();
+  rows.forEach(r=>{
+    if(r.dpeChecked===undefined&&r.dpeInfo!==undefined)r.dpeChecked=true;
+    const k=normTxt([r.voie,r.commune].filter(Boolean).join(' '));
+    if(k&&!r.dpeChecked){if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r);}
+  });
+  const entries=[...groups.values()];let done=0,errors=0,cursor=0;
+  async function worker(){
+    while(cursor<entries.length&&guard()){
+      const group=entries[cursor++],sample=group[0];
+      try{
+        const cands=await queryDpeAddress([sample.voie,sample.commune].filter(Boolean).join(' '));
+        if(!guard())return;
+        group.forEach(r=>{r.dpeInfo=chooseDpeCandidate(r,cands);r.dpeChecked=true;saveStableRow(r);});
+      }catch(e){
+        if(!guard())return;
+        errors++;group.forEach(r=>{r.dpeChecked=false;delete r.dpeInfo;});
+      }
+      done++;progress?.(done,entries.length,errors);
+      await sleep(90);
+    }
+  }
+  await Promise.all(Array.from({length:Math.min(5,entries.length)},worker));
+  return{groups:entries.length,errors,cancelled:!guard()};
+}
+async function enrichRowsPublic(rows,progress,guard=()=>true){
+  const todo=rows.filter(r=>!r.publicInfo?.done||!r.publicInfo?.coproDecision);let done=0,errors=0,cursor=0;
+  async function worker(){
+    while(cursor<todo.length&&guard()){
+      const r=todo[cursor++];
+      try{
+        await enrichPublicForRow(r);
+        if(!guard())return;
+        if(r.publicInfo?.errors?.length)errors++;
+      }catch(e){
+        if(!guard())return;
+        errors++;
+        const locked=loadCoproDecision(r,r.publicInfo?.banId||r.dpeInfo?.banId||'');
+        r.publicInfo={...(r.publicInfo||{}),done:false,osmChecked:false,coproDecision:locked||r.publicInfo?.coproDecision||null,errors:['public']};
+      }
+      done++;progress?.(done,todo.length,errors);
+      await sleep(230);
+    }
+  }
+  await Promise.all(Array.from({length:Math.min(3,todo.length)},worker));
+  return{count:todo.length,errors,cancelled:!guard()};
+}
+async function enrichAllAuditsSimple(rows,progress,guard=()=>true){
+  const todo=rows.filter(r=>!r.auditChecked);let done=0,errors=0,cursor=0;
+  async function worker(){
+    while(cursor<todo.length&&guard()){
+      const r=todo[cursor++];
+      try{
+        const found=await lookupAuditForRow(r);
+        if(!guard())return;
+        r.auditInfo=found;r.auditChecked=true;saveStableRow(r);
+      }catch(e){
+        if(!guard())return;
+        errors++;r.auditInfo=null;r.auditChecked=false;
+      }
+      done++;progress?.(done,todo.length,errors);
+      await sleep(100);
+    }
+  }
+  await Promise.all(Array.from({length:Math.min(3,todo.length)},worker));
+  return{count:todo.length,errors,cancelled:!guard()};
+}
+
+async function enrichSimpleDetermination(force=false){
+  if(state.qual.running||!state.qual.rows.length)return;
+  const myEpoch=++enrichmentEpoch,alive=()=>myEpoch===enrichmentEpoch;
+  state.qual.simpleStarted=true;state.qual.running=true;
+  try{
+    const rows=[...state.qual.rows];
+    if(force){
+      clearRuntimeEnrichmentCaches();
+      rows.forEach(r=>{
+        const locked=loadCoproDecision(r,r.publicInfo?.banId||r.dpeInfo?.banId||'');
+        clearStableRow(r);r.dpeChecked=false;delete r.dpeInfo;
+        r.publicInfo=locked?{done:false,osmChecked:false,coproDecision:locked,immat:locked.immat||'',immatSource:locked.source||'',errors:[]}:null;
+        r.auditChecked=false;r.auditInfo=null;
+      });
+    }
+    if(!alive())return;
+    setStatus(`Tableau affiché · enrichissement DPE en arrière-plan (${rows.length} ventes)…`,'info');
+    const er=await enrichRowsDpe(rows,(d,n,e)=>{if(!alive())return;const info=document.getElementById('srcInfo');if(info)info.textContent=`DPE ADEME ${d}/${n}${e?' · '+e+' erreur(s)':''}…`;},alive);
+    if(!alive())return;
+    state.qual.dpeErrors=er.errors;state.qual.enrichedCount=rows.filter(r=>r.dpeInfo!=null).length;state.qual.enrichedAll=true;
+    renderQualifiedResults();
+    setStatus(`DPE chargé · enrichissement copropriété / équipements / travaux en parallèle…`,'info');
+    const [pe,ae]=await Promise.all([
+      enrichRowsPublic(rows,(d,n)=>{if(!alive())return;const info=document.getElementById('srcInfo');if(info)info.textContent=`BDNB / RNIC / OSM ${d}/${n}…`;},alive),
+      enrichAllAuditsSimple(rows,(d,n)=>{if(!alive())return;const el=document.getElementById('simpleProgress');if(el)el.textContent=`AUDIT ADEME ${d}/${n}…`;},alive)
+    ]);
+    if(!alive())return;
+    state.qual.publicErrors+=pe.errors;state.qual.auditErrors+=ae.errors;
+    state.qual.publicEnrichedCount=rows.filter(r=>r.publicInfo?.done).length;state.qual.publicEnrichedAll=state.qual.publicEnrichedCount>=rows.length;
+    state.qual.auditEnrichedCount=rows.filter(r=>r.auditChecked).length;state.qual.auditEnrichedAll=state.qual.auditEnrichedCount>=rows.length;
+    renderQualifiedResults();
+    const c=simpleEnrichmentCounts();
+    setStatus(`Tableau enrichi : ${c.total} ventes · ${c.dpe} DPE · ${c.public} données bâtiment/copro/OSM · ${c.audit} audits vérifiés.`,'ok');
+  }catch(e){
+    if(alive()){console.error(e);setStatus('Enrichissement du tableau : '+e.message,'err');}
+  }finally{
+    if(alive())state.qual.running=false;
+  }
+}
+
+/* Chaque nouvelle analyse invalide immédiatement les enrichissements de la précédente. */
+const __mdbApplyBase=apply;
+apply=async function(){
+  enrichmentEpoch++;
+  state.qual.running=false;
+  state.qual.simpleStarted=false;
+  return __mdbApplyBase();
+};
+
+
+/* Mutations sur carte — couleur par type, taille fixe */
+const DOT_RADIUS=5;
+function drawMutations(){
+  mutMarkers.clearLayers();
+  const S=sel().filter(r=>isFinite(r.lat)&&isFinite(r.lon));
+  const present=new Set();
+  S.forEach(r=>{
+    present.add(r.type);
+    const color=TYPE_COLOR[r.type]||TYPE_COLOR.Autre;
+    L.circleMarker([r.lat,r.lon],{radius:DOT_RADIUS,color:'#ffffff',weight:1,fillColor:color,fillOpacity:.85})
+      .bindTooltip(
+        `<div style="font-weight:800;margin-bottom:2px">${r.type}</div>${f0(r.surface)} m²<br>Prix : <b>${eur(r.val)}</b><br>Prix/m² : ${ppmF(r.ppm)}<br>Pièces : ${isFinite(r.pieces)?r.pieces:'—'}<br>${r.commune||''}`,
+        {direction:'top',opacity:1,sticky:true,className:'mut-tip'})
+      .addTo(mutMarkers);
+  });
+  updateLegend(present);
+}
+function fitMap(){
+  try{
+    const layers=mutMarkers.getLayers();
+    if(layers.length){ map.fitBounds(L.featureGroup(layers).getBounds().pad(0.12)); }
+    else if(state.addresses.length){ map.setView([state.addresses[0].lat,state.addresses[0].lon],14); }
+  }catch(e){}
+}
+
+/* ---------------- Statut ---------------- */
+let stTimer;
+function setStatus(m,t){
+  const s=document.getElementById('status');s.className='status show '+t;s.textContent=m;s.onclick=()=>s.classList.remove('show');
+  const info=document.getElementById('srcInfo'); if(info) info.textContent=m;
+  clearTimeout(stTimer); if(t==='ok') stTimer=setTimeout(()=>s.classList.remove('show'),8000);
+}
+
+/* ---------------- Export ---------------- */
+function exportExcel(){
+  const S=sel();if(!S.length)return;closeExport();
+  const wb=XLSX.utils.book_new();
+  const rows=S.map(r=>({Date:r.date,Type:r.type,'Pièces':isFinite(r.pieces)?r.pieces:'','Surface m²':r.surface||'','Valeur €':r.val,'€/m²':isFinite(r.ppm)?Math.round(r.ppm):'',Adresse:r.voie,Commune:r.commune,Parcelle:r.parcelle}));
+  const ws=XLSX.utils.json_to_sheet(rows);ws['!cols']=[{wch:11},{wch:12},{wch:7},{wch:9},{wch:11},{wch:9},{wch:28},{wch:18},{wch:16}];
+  XLSX.utils.book_append_sheet(wb,ws,'Mutations');
+  const vals=S.map(r=>r.val).filter(isFinite),ppms=S.map(r=>r.ppm).filter(isFinite),surfs=S.map(r=>r.surface).filter(v=>v>0);
+  const syn=[['SAS De Mère en Fils MDB — Synthèse DVF'],[],
+    ['Secteur',state.addresses.map(a=>a.label).join(' ; ')],
+    ['Rayon',km(+document.getElementById('radius').value)],
+    ['Période',document.getElementById('yFrom').value+' – '+document.getElementById('yTo').value],
+    ['Mutations',S.length],[],
+    ['Indicateur','Valeur foncière','Prix/m²'],
+    ['Moyenne',Math.round(mean(vals)),Math.round(mean(ppms))],
+    ['Médiane',Math.round(median(vals)),Math.round(median(ppms))],
+    ['Min',Math.round(arrMin(vals)),Math.round(arrMin(ppms))],
+    ['Max',Math.round(arrMax(vals)),Math.round(arrMax(ppms))],
+    ['Surface moyenne (m²)',Math.round(mean(surfs))]];
+  const ws2=XLSX.utils.aoa_to_sheet(syn);ws2['!cols']=[{wch:24},{wch:16},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws2,'Synthèse');
+  XLSX.writeFile(wb,'DVF_Secteur_MDB.xlsx');
+}
+function exportPdf(){
+  const S=sel();if(!S.length)return;closeExport();
+  // Formatage sûr pour jsPDF : séparateur = espace ASCII normal (pas d'espace insécable)
+  const pfNum=n=>isFinite(n)?String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,' '):'-';
+  const pEur=n=>isFinite(n)?pfNum(n)+' €':'-';
+  const pPpm=n=>isFinite(n)?pfNum(n)+' €/m²':'-';
+  const{jsPDF}=window.jspdf;const doc=new jsPDF('p','mm','a4');const W=doc.internal.pageSize.getWidth();
+  doc.setFillColor(...INK);doc.rect(0,0,W,26,'F');doc.setFillColor(...GOLD);doc.rect(0,26,W,1.4,'F');
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(14);doc.text('SAS De Mère en Fils MDB',14,12);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(200,200,200);doc.text('Analyse foncière · DVF · Étude de secteur',14,18);
+  doc.setFontSize(8);doc.text('SIREN 990 726 432 · Saint-Maur-des-Fossés',W-14,12,{align:'right'});doc.text(new Date().toLocaleDateString('fr-FR'),W-14,18,{align:'right'});
+  let y=36;doc.setTextColor(...INK);doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text('Secteur',14,y);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(60,60,60);
+  y+=6;doc.text(state.addresses.map(a=>a.label).join(' ; ').slice(0,110),14,y);
+  y+=5;doc.text(`Rayon ${km(+document.getElementById('radius').value)} · Période ${document.getElementById('yFrom').value}–${document.getElementById('yTo').value} · ${S.length} mutations`,14,y);
+  const vals=S.map(r=>r.val).filter(isFinite),ppms=S.map(r=>r.ppm).filter(isFinite);
+  y+=8;doc.autoTable({startY:y,head:[['Indicateur','Valeur foncière','Prix/m²']],
+    body:[['Moyenne',pEur(mean(vals)),pPpm(mean(ppms))],['Médiane',pEur(median(vals)),pPpm(median(ppms))],
+      ['Min',pEur(arrMin(vals)),pPpm(arrMin(ppms))],['Max',pEur(arrMax(vals)),pPpm(arrMax(ppms))]],
+    theme:'grid',headStyles:{fillColor:INK,textColor:255,fontSize:8.5},bodyStyles:{fontSize:8.5},margin:{left:14,right:14},
+    columnStyles:{1:{halign:'right'},2:{halign:'right'}}});
+  y=doc.lastAutoTable.finalY+8;
+  if(y>235){doc.addPage();y=20;}
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...INK);doc.text('Mutations',14,y);
+  doc.autoTable({startY:y+3,head:[['Date','Type','P.','Surf.','Valeur','€/m²','Adresse']],
+    body:S.slice(0,60).map(r=>[r.date,r.type,isFinite(r.pieces)?r.pieces:'',r.surface||'',pEur(r.val),isFinite(r.ppm)?pfNum(r.ppm):'',(r.voie||'').slice(0,34)]),
+    theme:'striped',headStyles:{fillColor:INK,textColor:255,fontSize:7.5},bodyStyles:{fontSize:7},margin:{left:14,right:14},
+    columnStyles:{2:{halign:'right'},3:{halign:'right'},4:{halign:'right'},5:{halign:'right'}}});
+  const pages=doc.internal.getNumberOfPages();
+  for(let i=1;i<=pages;i++){doc.setPage(i);const H=doc.internal.pageSize.getHeight();doc.setFontSize(7);doc.setTextColor(140,140,140);
+    doc.text('SAS De Mère en Fils MDB — Analyse indicative DVF (DGFiP). Document de travail, sans valeur d\'expertise.',14,H-8);
+    doc.text(`${i}/${pages}`,W-14,H-8,{align:'right'});}
+  doc.save('DVF_Secteur_MDB.pdf');
+}
+
+/* init */
+updateRadius();
+setView('carte');
+setDefaultSector();
+// Le préchargement est maintenant déclenché automatiquement par addAddress().
+// Si la période change, on prépare immédiatement les nouvelles années en arrière-plan.
+document.getElementById('yFrom').addEventListener('change',prefetchSelectedCommunes);
+document.getElementById('yTo').addEventListener('change',prefetchSelectedCommunes);
+// Point par défaut : siège SAS De Mère en Fils MDB (la géoloc PC est trop imprécise).
+async function setDefaultSector(){
+  const HOME={q:'81 Boulevard Rabelais 94100 Saint-Maur-des-Fossés', lat:48.79646, lon:2.48787, insee:'94068', label:'81 Boulevard Rabelais, 94100 Saint-Maur-des-Fossés'};
+  try{
+    const r=await fetch('https://api-adresse.data.gouv.fr/search/?limit=1&q='+encodeURIComponent(HOME.q));
+    const j=await r.json(); const f=j.features&&j.features[0];
+    if(f){ if(state.addresses.length)return; const [lon,lat]=f.geometry.coordinates;
+      addAddress(f.properties.label,lat,lon,f.properties.citycode,f.properties.id||''); map.setView([lat,lon],16);
+      setStatus('Secteur par défaut : '+f.properties.label,'ok'); return; }
+    throw new Error('no result');
+  }catch(e){
+    if(state.addresses.length)return;
+    addAddress(HOME.label, HOME.lat, HOME.lon, HOME.insee); map.setView([HOME.lat,HOME.lon],16);
+    setStatus('Secteur par défaut : '+HOME.label,'ok');
+  }
+}
+
+
+/* ============================================================
+   OPTIMISATION PROGRESSION + ENRICHISSEMENT PUBLIC
+   - affiche BDNB/RNIC/OSM et AUDIT simultanément
+   - parallélise uniquement les appels indépendants
+   - conserve exactement les mêmes règles de fiabilité copro
+   ============================================================ */
+function simpleProgressText(){
+  const c=simpleEnrichmentCounts(),p=state.qual._dualProgress||{};
+  const pubDone=Number.isFinite(p.pubDone)?p.pubDone:c.public, pubTotal=Number.isFinite(p.pubTotal)?p.pubTotal:c.total;
+  const audDone=Number.isFinite(p.audDone)?p.audDone:c.audit, audTotal=Number.isFinite(p.audTotal)?p.audTotal:c.total;
+  return `<span class="pubp">BDNB / RNIC / OSM ${pubDone}/${pubTotal}</span><span class="sep">·</span><span class="auditp">AUDIT ADEME ${audDone}/${audTotal}</span>`;
+}
+function updateSimpleDualProgress(pubDone,pubTotal,audDone,audTotal){
+  const prev=state.qual._dualProgress||{};
+  state.qual._dualProgress={
+    pubDone:Number.isFinite(pubDone)?pubDone:prev.pubDone,
+    pubTotal:Number.isFinite(pubTotal)?pubTotal:prev.pubTotal,
+    audDone:Number.isFinite(audDone)?audDone:prev.audDone,
+    audTotal:Number.isFinite(audTotal)?audTotal:prev.audTotal
+  };
+  const el=document.getElementById('simpleProgress');if(el)el.innerHTML=simpleProgressText();
+}
+
+async function publicMapLimitFast(items,limit,fn,guard=()=>true){
+  const out=new Array(items.length);let cursor=0;
+  async function worker(){while(cursor<items.length&&guard()){const i=cursor++;out[i]=await fn(items[i],i);}}
+  await Promise.all(Array.from({length:Math.min(limit,items.length)},worker));
+  return out;
+}
+
+/* Même règle de décision qu'avant, mais parcelles et vérifications RNIC sont parallélisées. */
+determineCoproDecision=async function(row,banId,bdnbAddress,addressChecked){
+  const cached=loadCoproDecision(row,banId);if(cached)return cached;
+  const parcelIds=coproParcelIds(row).slice(0,12);let parcelErrors=0;
+  const parcelResults=await publicMapLimitFast(parcelIds,3,async pid=>{
+    try{return{pid,bdnb:await queryBdnbByParcel(pid,row.dpeInfo?.rnbId||''),checked:true};}
+    catch(e){parcelErrors++;return{pid,bdnb:null,checked:false};}
+  });
+  const ids=new Map();
+  const addId=(id,src)=>{id=String(id||'').trim();if(!id)return;ids.set(id,ids.has(id)?ids.get(id)+' + '+src:src);};
+  if(bdnbPositive(bdnbAddress))addId(bdnbAddress.coproId,bdnbAddress.ambiguous?'BDNB adresse · copro commune aux bâtiments':'BDNB adresse');
+  for(const pr of parcelResults)if(bdnbPositive(pr.bdnb))addId(pr.bdnb.coproId,`BDNB parcelle ${pr.pid}`);
+  if(row.dpeInfo?.confidence==='high')addId(row.dpeInfo?.coproId,'DPE certain');
+
+  if(row.dpeInfo?.confidence==='medium'&&row.dpeInfo?.coproId){
+    try{const rn=await queryRnicByImmat(row.dpeInfo.coproId);if(rn){const decision=saveCoproDecision(row,banId,{value:true,confidence:'high',source:'RNIC + DPE probable',immat:row.dpeInfo.coproId});return{...decision,rnic:rn};}}catch(e){}
+  }
+  if(ids.size){
+    const entries=[...ids.entries()];
+    const checks=await publicMapLimitFast(entries,3,async ([immat,src])=>{try{const rn=await queryRnicByImmat(immat);return rn?{immat,src,rn}:null;}catch(e){return null;}});
+    const verified=checks.filter(Boolean),chosen=verified[0]||null,first=entries[0];
+    const immat=chosen?.immat||first?.[0]||'',src=chosen?('RNIC + '+chosen.src):(ids.size>1?'Plusieurs sources positives BDNB/DPE':first?.[1]||'source positive');
+    const decision=saveCoproDecision(row,banId,{value:true,confidence:chosen?'high':(String(src).includes('BDNB')?'high':'medium'),source:src,immat});
+    return{...decision,rnic:chosen?.rn||null};
+  }
+  const parcelsFullyChecked=parcelIds.length>0&&parcelErrors===0&&parcelResults.length===parcelIds.length;
+  const parcelsAllNo=parcelsFullyChecked&&parcelResults.every(x=>bdnbDefiniteNo(x.bdnb));
+  if(addressChecked&&bdnbDefiniteNo(bdnbAddress)&&parcelsAllNo)return{value:false,confidence:'high',source:'BDNB adresse + toutes parcelles',immat:'',key:'CORE:'+coproCoreKey(row),locked:false};
+  return{value:null,confidence:'low',source:'Données insuffisantes',immat:'',key:'CORE:'+coproCoreKey(row),locked:false};
+};
+
+/* OSM démarre immédiatement pendant BAN/BDNB. Aucun seuil de fiabilité n'est modifié. */
+enrichPublicForRow=async function(row){
+  let banId=row.dpeInfo?.banId||row.publicInfo?.banId||'';
+  const cachedDecision=loadCoproDecision(row,banId),sig=publicEnrichmentSig(row,banId);
+  if(row.publicInfo?.done&&row.publicInfo?.osmChecked&&row.publicInfo?.sig===sig&&row.publicInfo?.coproDecision)return row.publicInfo;
+  const errors=[];
+  let osm=row.publicInfo?.osm||null,osmChecked=!!row.publicInfo?.osmChecked;
+  const osmPromise=osmChecked?Promise.resolve({ok:true,value:osm}):queryOsmAround(row.lat,row.lon).then(v=>({ok:true,value:v})).catch(e=>({ok:false,error:e}));
+
+  if(!banId){try{banId=await lookupBanId([row.voie,row.commune].filter(Boolean).join(' '));}catch(e){errors.push('BAN');}}
+  let bdnb=null,bdnbChecked=false;
+  if(banId){try{bdnb=await queryBdnbByBanId(banId,row.dpeInfo?.rnbId||'');bdnbChecked=true;}catch(e){errors.push('BDNB');}}
+
+  let coproDecision=cachedDecision||loadCoproDecision(row,banId)||null;
+  if(!coproDecision){try{coproDecision=await determineCoproDecision(row,banId,bdnb,bdnbChecked);}catch(e){errors.push('COPRO');coproDecision=loadCoproDecision(row,banId)||{value:null,confidence:'low',source:'Erreur de vérification',immat:'',key:'CORE:'+coproCoreKey(row),locked:false};}}
+  const immat=coproDecision?.value===true?(coproDecision.immat||''):'',immatSource=coproDecision?.source||'';
+  let rnic=coproDecision?.rnic||null;
+  if(immat&&!rnic){try{rnic=await queryRnicByImmat(immat);}catch(e){errors.push('RNIC');}}
+
+  if(!osmChecked){const or=await osmPromise;if(or.ok){osm=or.value;osmChecked=true;}else errors.push('OSM');}
+  const criticalError=errors.includes('BAN')||errors.includes('BDNB');
+  row.publicInfo={sig:publicEnrichmentSig(row,banId),done:!criticalError,osmChecked,banId,bdnb,bdnbChecked,rnic,immat,immatSource,coproDecision,osm,errors};
+  if(coproDecision?.value!==null)saveCoproDecision(row,banId,coproDecision);
+  if(row.publicInfo.done)saveStableRow(row);return row.publicInfo;
+};
+
+/* 4 lignes à la fois au lieu de 3, avec temporisation réduite mais conservatrice. */
+enrichRowsPublic=async function(rows,progress,guard=()=>true){
+  const todo=rows.filter(r=>!r.publicInfo?.done||!r.publicInfo?.coproDecision);let done=0,errors=0,cursor=0;
+  async function worker(){
+    while(cursor<todo.length&&guard()){
+      const r=todo[cursor++];
+      try{await enrichPublicForRow(r);if(!guard())return;if(r.publicInfo?.errors?.length)errors++;}
+      catch(e){if(!guard())return;errors++;const locked=loadCoproDecision(r,r.publicInfo?.banId||r.dpeInfo?.banId||'');r.publicInfo={...(r.publicInfo||{}),done:false,osmChecked:false,coproDecision:locked||r.publicInfo?.coproDecision||null,errors:['public']};}
+      done++;progress?.(done,todo.length,errors);await sleep(120);
+    }
+  }
+  await Promise.all(Array.from({length:Math.min(4,todo.length)},worker));
+  return{count:todo.length,errors,cancelled:!guard()};
+};
+
+/* Affichage principal : une case de progression combinée, toujours visible. */
+renderQualifiedResults=function(){
+  const body=document.getElementById('qualBody');if(!body)return;if(!state.qual.rows.length){renderQualifiedBase();return;}
+  const source=qualifiedSourceRows();
+  if(source.length!==state.qual.rows.length||source.some((r,i)=>rowKey(r)!==rowKey(state.qual.rows[i]))){state.qual.simpleStarted=false;renderQualifiedBase();return;}
+  const rows=qualifiedFilteredRows(true),c=simpleEnrichmentCounts();
+  body.innerHTML=`<div class="qual-hero simple-qual-hero"><div><h2>Détermination du prix</h2><p>Filtre les ventes, puis coche uniquement les biens que tu veux conserver dans le calcul du prix médian.</p></div><div class="qual-source">${c.total} VENTES · ${c.dpe} DPE · ${c.public} PUBLIC</div></div>
+  <div class="qual-panel simple-table-panel"><div class="simple-table-head"><div><h3>Tableau des ventes analysées</h3><div class="subtxt">Le Prix global médian est calculé uniquement sur les ventes affichées que tu laisses cochées dans « Garder ».</div></div><div class="simple-head-actions"><span id="qualVisibleCount" class="visible-count">${rows.length} / ${state.qual.rows.length} ventes affichées</span><span id="simpleProgress" class="simple-progress-box">${simpleProgressText()}</span><button class="qual-secondary" onclick="enrichSimpleDetermination(true)">Actualiser depuis les sources</button></div></div><div id="simpleGlobalPrice">${simpleGlobalPriceHtml(rows)}</div>${filterBarHtml()}<div class="qual-table-wrap simple-table-wrap"><table class="qual-table simple-qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div><div class="qual-warn"><b>Données stabilisées :</b> les enrichissements DPE / BDNB / RNIC / OSM / AUDIT sont réutilisés lorsqu’ils sont déjà fiabilisés. Si tu relances une nouvelle analyse, les recherches de l’analyse précédente sont immédiatement abandonnées et la priorité passe au nouveau jeu de ventes.</div></div>`;
+  if(state.view==='qualifies'&&!state.qual.simpleStarted&&!state.qual.running){state.qual.simpleStarted=true;setTimeout(()=>enrichSimpleDetermination(false),40);}
+};
+
+/* Les deux compteurs progressent côte à côte pendant les chargements parallèles. */
+enrichSimpleDetermination=async function(force=false){
+  if(state.qual.running||!state.qual.rows.length)return;
+  const myEpoch=++enrichmentEpoch,alive=()=>myEpoch===enrichmentEpoch;
+  state.qual.simpleStarted=true;state.qual.running=true;
+  try{
+    const rows=[...state.qual.rows];
+    if(force){
+      clearRuntimeEnrichmentCaches();
+      rows.forEach(r=>{const locked=loadCoproDecision(r,r.publicInfo?.banId||r.dpeInfo?.banId||'');clearStableRow(r);r.dpeChecked=false;delete r.dpeInfo;r.publicInfo=locked?{done:false,osmChecked:false,coproDecision:locked,immat:locked.immat||'',immatSource:locked.source||'',errors:[]}:null;r.auditChecked=false;r.auditInfo=null;});
+    }
+    state.qual._dualProgress={pubDone:rows.filter(r=>r.publicInfo?.done).length,pubTotal:rows.length,audDone:rows.filter(r=>r.auditChecked).length,audTotal:rows.length};
+    updateSimpleDualProgress();
+    if(!alive())return;
+    setStatus(`Tableau affiché · enrichissement DPE en arrière-plan (${rows.length} ventes)…`,'info');
+    const er=await enrichRowsDpe(rows,(d,n,e)=>{if(!alive())return;const info=document.getElementById('srcInfo');if(info)info.textContent=`DPE ADEME ${d}/${n}${e?' · '+e+' erreur(s)':''}…`;},alive);
+    if(!alive())return;
+    state.qual.dpeErrors=er.errors;state.qual.enrichedCount=rows.filter(r=>r.dpeInfo!=null).length;state.qual.enrichedAll=true;
+    renderQualifiedResults();updateSimpleDualProgress();
+    setStatus(`DPE chargé · enrichissement copropriété / équipements / travaux en parallèle…`,'info');
+    let pd=rows.filter(r=>r.publicInfo?.done).length,ad=rows.filter(r=>r.auditChecked).length;
+    updateSimpleDualProgress(pd,rows.length,ad,rows.length);
+    const [pe,ae]=await Promise.all([
+      enrichRowsPublic(rows,(d,n)=>{if(!alive())return;pd=d;updateSimpleDualProgress(pd,n,ad,rows.length);const info=document.getElementById('srcInfo');if(info)info.textContent=`BDNB / RNIC / OSM ${d}/${n}…`;},alive),
+      enrichAllAuditsSimple(rows,(d,n)=>{if(!alive())return;ad=d;updateSimpleDualProgress(pd,rows.length,ad,n);},alive)
+    ]);
+    if(!alive())return;
+    state.qual.publicErrors+=pe.errors;state.qual.auditErrors+=ae.errors;
+    state.qual.publicEnrichedCount=rows.filter(r=>r.publicInfo?.done).length;state.qual.publicEnrichedAll=state.qual.publicEnrichedCount>=rows.length;
+    state.qual.auditEnrichedCount=rows.filter(r=>r.auditChecked).length;state.qual.auditEnrichedAll=state.qual.auditEnrichedCount>=rows.length;
+    state.qual._dualProgress={pubDone:state.qual.publicEnrichedCount,pubTotal:rows.length,audDone:state.qual.auditEnrichedCount,audTotal:rows.length};
+    renderQualifiedResults();updateSimpleDualProgress();
+    const c=simpleEnrichmentCounts();setStatus(`Tableau enrichi : ${c.total} ventes · ${c.dpe} DPE · ${c.public} données bâtiment/copro/OSM · ${c.audit} audits vérifiés.`,'ok');
+  }catch(e){if(alive()){console.error(e);setStatus('Enrichissement du tableau : '+e.message,'err');}}
+  finally{if(alive())state.qual.running=false;}
+};
+/* ============================================================
+   AIDE À LA DÉCISION — FIABILITÉ / FOURCHETTE / DISPERSION / CARTE / COMPARATEUR / EXPORT
+   ============================================================ */
+function qtile(values,p){const a=(values||[]).filter(v=>isFinite(v)).sort((x,y)=>x-y);if(!a.length)return NaN;if(a.length===1)return a[0];const pos=(a.length-1)*p,lo=Math.floor(pos),hi=Math.ceil(pos);return lo===hi?a[lo]:a[lo]+(a[hi]-a[lo])*(pos-lo);}
+function reliabilityInfo(r){
+  const d=r?.dpeInfo,dc=d?.confidence||'none',c=publicCoproStatus(r),pc=c?.confidence||'none',pub=r?.publicInfo;
+  const low=dc==='low'||pc==='low'||(pub?.errors?.length>0);
+  let level='none',label='Partielle';
+  if(low){level='low';label='À vérifier';}
+  else if(dc==='high'&&c?.value!==null&&pc==='high'){level='high';label='Forte';}
+  else if(['high','medium'].includes(dc)||['high','medium'].includes(pc)){level='medium';label='Bonne';}
+  const detail=`DPE : ${confidenceLabel(dc)} · Copro : ${c?.value===true?'confirmée':c?.value===false?'non détectée':c?.label||'inconnue'}`;
+  return{level,label,detail};
+}
+function reliabilityHtml(r){const x=reliabilityInfo(r);return`<span class="reliability-badge ${x.level}" title="${esc(x.detail)}">${x.level==='high'?'●':x.level==='medium'?'●':x.level==='low'?'▲':'○'} ${x.label}</span><span class="rel-detail">${esc(x.detail)}</span>`;}
+
+simpleGlobalPriceStats=function(rows){
+  ensurePriceConditionState();
+  const kept=(rows||[]).filter(priceRowIsKept),ppms=kept.map(r=>r.ppm).filter(v=>isFinite(v)&&v>0);
+  const q1=qtile(ppms,.25),rawPpm=qtile(ppms,.5),q3=qtile(ppms,.75),surface=Number(state.qual.valuationSurface),adj=priceConditionCoef(),factor=1+adj/100;
+  const validSurface=isFinite(surface)&&surface>0?surface:NaN,basePrice=isFinite(rawPpm)&&isFinite(validSurface)?rawPpm*validSurface:NaN;
+  const dispersion=isFinite(q1)&&isFinite(q3)&&isFinite(rawPpm)&&rawPpm>0?(q3-q1)/rawPpm*100:NaN;
+  const dispersionLevel=!isFinite(dispersion)?'none':dispersion<=10?'low':dispersion<=20?'medium':'high';
+  const dispersionLabel=dispersionLevel==='low'?'Faible':dispersionLevel==='medium'?'Modérée':dispersionLevel==='high'?'Élevée':'Non calculable';
+  return{displayed:(rows||[]).length,kept:kept.length,rawPpm,q1,q3,surface:validSurface,adj,basePrice,price:isFinite(basePrice)?basePrice*factor:NaN,adjustedPpm:isFinite(rawPpm)?rawPpm*factor:NaN,lowPpm:isFinite(q1)?q1*factor:NaN,highPpm:isFinite(q3)?q3*factor:NaN,lowPrice:isFinite(q1)&&isFinite(validSurface)?q1*validSurface*factor:NaN,highPrice:isFinite(q3)&&isFinite(validSurface)?q3*validSurface*factor:NaN,dispersion,dispersionLevel,dispersionLabel};
+};
+
+simpleGlobalPriceHtml=function(rows){
+  ensurePriceConditionState();const st=simpleGlobalPriceStats(rows),cond=state.qual.priceCondition,coef=priceConditionCoef();
+  const options=PRICE_CONDITIONS.map(([k,l])=>`<option value="${k}" ${k===cond?'selected':''}>${esc(l)} (${priceConditionPct(Number(state.qual.conditionAdjustments[k]))})</option>`).join('');
+  const chips=PRICE_CONDITIONS.map(([k,l])=>`<span class="sgp-state-chip ${k===cond?'active':''}" data-condition="${k}">${esc(l)} ${priceConditionPct(Number(state.qual.conditionAdjustments[k]))}</span>`).join('');
+  return `<div class="simple-global-price-card">
+    <div>
+      <div class="sgp-label">Prix global médian</div><div class="sgp-value" id="sgpMainValue">${isFinite(st.price)?eur(st.price):'—'}</div>
+      <div class="sgp-subvalue">Prix avant ajustement d’état : <b id="sgpBaseValue">${isFinite(st.basePrice)?eur(st.basePrice):'—'}</b></div>
+      <div class="price-range-grid"><div class="price-range-box"><div class="k">Fourchette basse</div><div class="v" id="sgpLowPrice">${isFinite(st.lowPrice)?eur(st.lowPrice):'—'}</div></div><div class="price-range-box mid"><div class="k">Médiane</div><div class="v" id="sgpMedianPrice">${isFinite(st.price)?eur(st.price):'—'}</div></div><div class="price-range-box"><div class="k">Fourchette haute</div><div class="v" id="sgpHighPrice">${isFinite(st.highPrice)?eur(st.highPrice):'—'}</div></div></div>
+      <div class="dispersion-pill ${st.dispersionLevel}" id="sgpDispersion">Dispersion ${st.dispersionLabel}${isFinite(st.dispersion)?' · '+st.dispersion.toFixed(1)+' %':''}</div>
+      <div class="keep-actions"><button onclick="setDisplayedPriceSelection(true)">✓ Garder tous les biens affichés</button><button onclick="setDisplayedPriceSelection(false)">× Tout retirer</button></div>
+    </div>
+    <div><div class="sgp-controls"><div class="sgp-control"><label>Surface cible (m²)</label><input id="sgpSurface" type="number" min="1" step="1" value="${isFinite(st.surface)?st.surface:''}" placeholder="Ex : 100" oninput="setValuationSurface(this.value)"></div><div class="sgp-control"><label>État du bien</label><select id="sgpCondition" onchange="setPriceCondition(this.value)">${options}</select></div><div class="sgp-control coef"><label>Ajustement (%)</label><div class="sgp-coef-row"><input id="sgpConditionCoef" type="number" min="-50" max="50" step="0.5" value="${coef}" oninput="setPriceConditionCoef(this.value)"><span class="pct">%</span></div></div></div><div class="sgp-formula" id="sgpFormula">${isFinite(st.rawPpm)&&isFinite(st.surface)?`${f0(st.surface)} m² × ${ppmF(st.rawPpm)} · ${priceConditionLabel(cond)} ${priceConditionPct(st.adj)}`:'Renseigne une surface cible pour calculer le prix global.'}</div><div class="sgp-state-scale">${chips}</div></div>
+    <div class="sgp-meta"><span class="selected-count" id="sgpSelectedCount">${st.kept} bien${st.kept>1?'s':''} gardé${st.kept>1?'s':''}</span> sur ${st.displayed} affiché${st.displayed>1?'s':''}<br>€/m² bas : <b id="sgpLowPpm">${isFinite(st.lowPpm)?ppmF(st.lowPpm):'—'}</b><br>€/m² médian : <b id="sgpAdjustedPpm">${isFinite(st.adjustedPpm)?ppmF(st.adjustedPpm):'—'}</b><br>€/m² haut : <b id="sgpHighPpm">${isFinite(st.highPpm)?ppmF(st.highPpm):'—'}</b></div>
+  </div>`;
+};
+
+updateGlobalPriceOutputs=function(){
+  const st=simpleGlobalPriceStats(qualifiedFilteredRows(true));
+  const set=(id,text)=>{const e=document.getElementById(id);if(e)e.textContent=text;};
+  set('sgpMainValue',isFinite(st.price)?eur(st.price):'—');set('sgpMedianPrice',isFinite(st.price)?eur(st.price):'—');set('sgpBaseValue',isFinite(st.basePrice)?eur(st.basePrice):'—');set('sgpLowPrice',isFinite(st.lowPrice)?eur(st.lowPrice):'—');set('sgpHighPrice',isFinite(st.highPrice)?eur(st.highPrice):'—');
+  set('sgpSelectedCount',`${st.kept} bien${st.kept>1?'s':''} gardé${st.kept>1?'s':''}`);set('sgpAdjustedPpm',isFinite(st.adjustedPpm)?ppmF(st.adjustedPpm):'—');set('sgpLowPpm',isFinite(st.lowPpm)?ppmF(st.lowPpm):'—');set('sgpHighPpm',isFinite(st.highPpm)?ppmF(st.highPpm):'—');
+  const f=document.getElementById('sgpFormula');if(f)f.textContent=isFinite(st.rawPpm)&&isFinite(st.surface)?`${f0(st.surface)} m² × ${ppmF(st.rawPpm)} · ${priceConditionLabel(state.qual.priceCondition)} ${priceConditionPct(st.adj)}`:'Renseigne une surface cible pour calculer le prix global.';
+  const d=document.getElementById('sgpDispersion');if(d){d.className=`dispersion-pill ${st.dispersionLevel}`;d.textContent=`Dispersion ${st.dispersionLabel}${isFinite(st.dispersion)?' · '+st.dispersion.toFixed(1)+' %':''}`;}
+};
+
+function fullProgressState(){const rows=state.qual.rows||[],p=state.qual._fullProgress||{};return{dpeDone:Number.isFinite(p.dpeDone)?p.dpeDone:rows.filter(r=>r.dpeChecked).length,dpeTotal:Number.isFinite(p.dpeTotal)?p.dpeTotal:rows.length,pubDone:Number.isFinite(p.pubDone)?p.pubDone:rows.filter(r=>r.publicInfo?.done||r.publicInfo?.errors?.length).length,pubTotal:Number.isFinite(p.pubTotal)?p.pubTotal:rows.length,audDone:Number.isFinite(p.audDone)?p.audDone:rows.filter(r=>r.auditChecked).length,audTotal:Number.isFinite(p.audTotal)?p.audTotal:rows.length};}
+function progressOne(label,done,total){const pct=total?Math.max(0,Math.min(100,done/total*100)):0,ok=total>0&&done>=total;return`<div class="ep-item ${ok?'done':''}"><div class="ep-head"><span>${label}</span><span>${done}/${total}${ok?' ✓':''}</span></div><div class="ep-track"><div class="ep-fill" style="width:${pct.toFixed(1)}%"></div></div></div>`;}
+function fullProgressHtml(){const p=fullProgressState();return progressOne('DPE ADEME',p.dpeDone,p.dpeTotal)+progressOne('BDNB / RNIC / OSM',p.pubDone,p.pubTotal)+progressOne('AUDIT ADEME',p.audDone,p.audTotal);}
+function updateFullProgress(dpeDone,dpeTotal,pubDone,pubTotal,audDone,audTotal){const old=state.qual._fullProgress||{};state.qual._fullProgress={dpeDone:Number.isFinite(dpeDone)?dpeDone:old.dpeDone,dpeTotal:Number.isFinite(dpeTotal)?dpeTotal:old.dpeTotal,pubDone:Number.isFinite(pubDone)?pubDone:old.pubDone,pubTotal:Number.isFinite(pubTotal)?pubTotal:old.pubTotal,audDone:Number.isFinite(audDone)?audDone:old.audDone,audTotal:Number.isFinite(audTotal)?audTotal:old.audTotal};const el=document.getElementById('simpleProgress');if(el)el.innerHTML=fullProgressHtml();}
+
+qualifiedTableHtml=function(rows){
+  const showFloor=shouldShowFloor(),cols=showFloor?20:19;let h=`<thead><tr><th class="keep-head">Garder</th>${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${showFloor?qualHeader('floor','Étage'):''}<th>Fiabilité</th>${qualHeader('copro','Copro')}${qualHeader('terrain','Terrain','num')}<th>Équipements / extérieurs</th>${qualHeader('works','Travaux / source')}${qualHeader('workBudget','Budget travaux préconisés (audit)','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('ppm','€/m²','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;
+  rows.forEach(r=>{const di=r.dpeInfo,b=simpleWorkBudget(r),keep=priceRowIsKept(r),sk=encodeURIComponent(stableRowId(r));h+=`<tr data-sync-key="${sk}" class="${keep?'price-kept':'price-excluded'} ${state.qual.mapFocusKey===sk?'sync-focus':''}" onmouseenter="syncTableHover('${sk}',true)" onmouseleave="syncTableHover('${sk}',false)"><td class="keep-head"><input class="price-keep" type="checkbox" ${keep?'checked':''} onchange="togglePriceKeep('${encodeURIComponent(rowKey(r))}')" title="Inclure ce bien dans le Prix global médian"></td><td>${r.date?.slice(0,7)||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td>${showFloor?`<td>${floorLabel(di?.floor)}</td>`:''}<td>${reliabilityHtml(r)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td>${freeFeaturesHtml(r)}</td><td>${simpleWorksCellHtml(r)}</td><td class="num">${isFinite(b.value)&&b.value>0?`<b>${eur(b.value)}</b><span class="conf">${b.source==='audit'?'travaux énergétiques préconisés · audit certain':'saisie manuelle'}</span>`:(b.source==='audit_unconfirmed'?`<span class="conf low"><b>À confirmer</b><br>audit non suffisamment rapproché</span>`:'—')}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;});
+  if(!rows.length)h+=`<tr><td colspan="${cols}" style="padding:28px;text-align:center"><b>Aucune vente ne correspond aux filtres actuels.</b><br><span class="conf" style="display:block;margin-top:6px">Clique « Réinitialiser » pour afficher toutes les ventes de l’analyse.</span></td></tr>`;return h+'</tbody>';
+};
+
+function syncKeyForRow(r){return encodeURIComponent(stableRowId(r));}
+function syncTableHover(key,on){const m=state._syncMarkers?.get(key);if(m){if(on)m.setStyle({radius:10,weight:3,color:'#fff',fillOpacity:1});else{const o=m._syncDefault||{};m.setStyle(o);}}const tr=document.querySelector(`[data-sync-key="${key}"]`);if(tr)tr.classList.toggle('sync-focus',!!on);}
+function openRowFromMap(key){state.qual.mapFocusKey=key;setView('qualifies');setTimeout(()=>{const tr=document.querySelector(`[data-sync-key="${key}"]`);if(tr){tr.classList.add('sync-focus');tr.scrollIntoView({behavior:'smooth',block:'center'});}else setStatus('Ce bien est masqué par les filtres actuels de Détermination du prix.','info');},100);}
+
+drawMutations=function(){
+  mutMarkers.clearLayers();const S=sel().filter(r=>isFinite(r.lat)&&isFinite(r.lon)),present=new Set(),qmap=new Map((state.qual.rows||[]).map(r=>[stableRowId(r),r]));let visible=null;try{visible=new Set(qualifiedFilteredRows(false).map(stableRowId));}catch(e){visible=new Set();}state._syncMarkers=new Map();
+  S.forEach(r=>{present.add(r.type);const q=qmap.get(stableRowId(r)),kept=q?priceRowIsKept(q):false,inFilters=q?visible.has(stableRowId(q)):false,color=kept&&inFilters?'#4A5240':(TYPE_COLOR[r.type]||TYPE_COLOR.Autre),opts={radius:kept&&inFilters?8:5,color:kept&&inFilters?'#fff':'#ffffff',weight:kept&&inFilters?2.5:1,fillColor:color,fillOpacity:kept&&inFilters?.98:.55};const m=L.circleMarker([r.lat,r.lon],opts).bindTooltip(`<div style="font-weight:800;margin-bottom:2px">${r.type}</div>${f0(r.surface)} m²<br>Prix : <b>${eur(r.val)}</b><br>Prix/m² : ${ppmF(r.ppm)}<br>${kept&&inFilters?'<b style="color:#a57f10">✓ Gardé pour le prix médian</b><br>':''}${r.commune||''}`,{direction:'top',opacity:1,sticky:true,className:'mut-tip'}).addTo(mutMarkers);m._syncDefault=opts;const key=syncKeyForRow(r);state._syncMarkers.set(key,m);m.on('mouseover',()=>syncTableHover(key,true));m.on('mouseout',()=>syncTableHover(key,false));m.on('click',()=>openRowFromMap(key));});updateLegend(present);
+};
+
+function renderComparator(){
+  const body=document.getElementById('compareBody');if(!body)return;const visible=qualifiedFilteredRows(false),rows=visible.filter(priceRowIsKept),st=simpleGlobalPriceStats(visible);
+  if(!rows.length){body.innerHTML='<div class="compare-hero"><h2>Comparateur</h2><p>Comparaison côte à côte des biens gardés.</p></div><div class="compare-panel"><div class="compare-empty">Aucun bien gardé avec les filtres actuels. Retourne dans « Détermination du prix » et coche les références à comparer.</div></div>';return;}
+  const cell=(label,fn)=>`<tr><td>${label}</td>${rows.map(r=>`<td>${fn(r)}</td>`).join('')}</tr>`;
+  let table=`<table class="compare-table"><thead><tr><th>Critère</th>${rows.map(r=>`<th><div class="compare-address">${esc(r.voie||r.commune||'Comparable')}</div><div class="compare-note">${r.date?.slice(0,7)||'—'} · ${isFinite(r.dist)?f0(r.dist)+' m':'—'}</div></th>`).join('')}</tr></thead><tbody>`;
+  table+=cell('Prix vendu',r=>`<div class="compare-price">${eur(r.val)}</div>`)+cell('€/m²',r=>`<b>${ppmF(r.ppm)}</b>`)+cell('Surface',r=>r.surface>0?f0(r.surface)+' m²':'—')+cell('Pièces',r=>isFinite(r.pieces)?r.pieces:'—')+cell('DPE',r=>`${dpeBadge(r.dpeInfo?.dpe)} <span class="conf">${confidenceLabel(r.dpeInfo?.confidence)}</span>`)+cell('Construction',r=>`${periodLabel(r.dpeInfo?.period)}${isFinite(r.dpeInfo?.year)?' · '+r.dpeInfo.year:''}`)+(shouldShowFloor()?cell('Étage',r=>floorLabel(r.dpeInfo?.floor)):'')+cell('Copropriété',r=>coproCell(r))+cell('Terrain',r=>r.terrain>0?f0(r.terrain)+' m²':'—')+cell('Fiabilité',r=>reliabilityHtml(r))+cell('Équipements / extérieurs',r=>freeFeaturesHtml(r))+cell('Travaux / audit',r=>simpleWorksCellHtml(r))+cell('Mutation',r=>mutationBadgeHtml(r));table+='</tbody></table>';
+  body.innerHTML=`<div class="compare-hero"><h2>Comparateur</h2><p>${rows.length} bien${rows.length>1?'s':''} gardé${rows.length>1?'s':''} · comparaison des mêmes références utilisées pour le Prix global médian.</p></div><div class="compare-panel"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px"><div><b>Fourchette actuelle :</b> ${isFinite(st.lowPrice)?eur(st.lowPrice):'—'} · <b>Médiane :</b> ${isFinite(st.price)?eur(st.price):'—'} · <b>Haute :</b> ${isFinite(st.highPrice)?eur(st.highPrice):'—'}</div><button class="decision-btn" onclick="setView('qualifies')">← Détermination du prix</button></div><div class="compare-scroll">${table}</div></div>`;
+}
+
+function exportFinalSelection(){
+  const visible=qualifiedFilteredRows(false),rows=visible.filter(priceRowIsKept);if(!rows.length){setStatus('Aucun bien gardé à exporter.','err');return;}const st=simpleGlobalPriceStats(visible);
+  const data=rows.map(r=>{const c=publicCoproStatus(r),rel=reliabilityInfo(r),b=simpleWorkBudget(r);return{'Date':r.date||'','Adresse':r.voie||'','Commune':r.commune||'','Distance (m)':isFinite(r.dist)?Math.round(r.dist):'','Type':r.type||'','Surface (m²)':r.surface||'','Pièces':isFinite(r.pieces)?r.pieces:'','DPE':r.dpeInfo?.dpe||'','Fiabilité DPE':confidenceLabel(r.dpeInfo?.confidence),'Construction':isFinite(r.dpeInfo?.year)?r.dpeInfo.year:periodLabel(r.dpeInfo?.period),'Copropriété':c.value===true?'Oui':c.value===false?'Non détectée':'Inconnue','Terrain (m²)':r.terrain||'','Fiabilité globale':rel.label,'Prix vendu (€)':r.val||'','Prix €/m²':r.ppm||'','Budget audit certain (€)':b.source==='audit'?b.value:'','Mutation':r.qMutation?.reason||''};});
+  const wb=XLSX.utils.book_new(),ws=XLSX.utils.json_to_sheet(data);ws['!cols']=Object.keys(data[0]).map(k=>({wch:Math.min(34,Math.max(12,k.length+2))}));XLSX.utils.book_append_sheet(wb,ws,'Comparables gardés');
+  const syn=[['SYNTHÈSE DE LA SÉLECTION FINALE',''],['Adresse recherchée',state.addresses.map(a=>a.label).join(' | ')],['Biens gardés',rows.length],['Surface cible (m²)',isFinite(st.surface)?st.surface:''],['État du bien',priceConditionLabel(state.qual.priceCondition)],['Ajustement (%)',st.adj],['€/m² bas',isFinite(st.lowPpm)?Math.round(st.lowPpm):''],['€/m² médian',isFinite(st.adjustedPpm)?Math.round(st.adjustedPpm):''],['€/m² haut',isFinite(st.highPpm)?Math.round(st.highPpm):''],['Prix bas (€)',isFinite(st.lowPrice)?Math.round(st.lowPrice):''],['Prix médian (€)',isFinite(st.price)?Math.round(st.price):''],['Prix haut (€)',isFinite(st.highPrice)?Math.round(st.highPrice):''],['Dispersion',st.dispersionLabel+(isFinite(st.dispersion)?' · '+st.dispersion.toFixed(1)+' %':'')]];const ws2=XLSX.utils.aoa_to_sheet(syn);ws2['!cols']=[{wch:28},{wch:45}];XLSX.utils.book_append_sheet(wb,ws2,'Synthèse');XLSX.writeFile(wb,'Selection_finale_DVF_MDB.xlsx');setStatus(`${rows.length} bien${rows.length>1?'s':''} gardé${rows.length>1?'s':''} exporté${rows.length>1?'s':''}.`,'ok');
+}
+
+refreshQualifiedView=function(){
+  const current=normalizeManualFilterState(state.qual.filters||{});state.qual.filters={dpe:getCheckedValues('qfDpe',current.dpe),pieces:getCheckedValues('qfPieces',current.pieces),constructionMin:document.getElementById('qfConstructionMin')?.value??current.constructionMin,constructionMax:document.getElementById('qfConstructionMax')?.value??current.constructionMax,floor:document.getElementById('qfFloor')?.value||'all',copro:document.getElementById('qfCopro')?.value||'all',terrain:document.getElementById('qfTerrain')?.value||'all'};
+  const rows=qualifiedFilteredRows(true),tbl=document.getElementById('qualTable');if(tbl)tbl.innerHTML=qualifiedTableHtml(rows);const c=document.getElementById('qualVisibleCount');if(c)c.textContent=`${rows.length} / ${state.qual.rows.length} ventes affichées`;const gp=document.getElementById('simpleGlobalPrice');if(gp)gp.innerHTML=simpleGlobalPriceHtml(rows);drawMutations();if(state.view==='comparateur')renderComparator();
+};
+
+togglePriceKeep=function(encoded){const k=decodeURIComponent(encoded),r=(state.qual.rows||[]).find(x=>rowKey(x)===k);if(!r)return;r.priceSelected=!priceRowIsKept(r);refreshQualifiedView();};
+setDisplayedPriceSelection=function(on){qualifiedFilteredRows(false).forEach(r=>r.priceSelected=!!on);refreshQualifiedView();};
+
+renderQualifiedResults=function(){
+  const body=document.getElementById('qualBody');if(!body)return;if(!state.qual.rows.length){renderQualifiedBase();return;}const source=qualifiedSourceRows();if(source.length!==state.qual.rows.length||source.some((r,i)=>rowKey(r)!==rowKey(state.qual.rows[i]))){state.qual.simpleStarted=false;renderQualifiedBase();return;}const rows=qualifiedFilteredRows(true),c=simpleEnrichmentCounts();
+  body.innerHTML=`<div class="qual-hero simple-qual-hero"><div><h2>Détermination du prix</h2><p>Filtre les ventes, puis coche uniquement les biens que tu veux conserver dans le calcul du prix médian.</p></div><div class="qual-source">${c.total} VENTES · ${c.dpe} DPE · ${c.public} PUBLIC</div></div><div class="qual-panel simple-table-panel"><div class="simple-table-head"><div><h3>Tableau des ventes analysées</h3><div class="subtxt">Le Prix global médian est calculé uniquement sur les ventes affichées que tu laisses cochées dans « Garder ».</div></div><div class="decision-actions"><span id="qualVisibleCount" class="visible-count">${rows.length} / ${state.qual.rows.length} ventes affichées</span><button class="decision-btn" onclick="setView('carte')">Voir sur la carte</button><button class="decision-btn" onclick="setView('comparateur')">Comparer</button><button class="decision-btn" onclick="exportFinalSelection()">Exporter la sélection</button><button class="qual-secondary" onclick="enrichSimpleDetermination(true)">Actualiser depuis les sources</button></div></div><div id="simpleProgress" class="enrichment-progress">${fullProgressHtml()}</div><div id="simpleGlobalPrice">${simpleGlobalPriceHtml(rows)}</div>${filterBarHtml()}<div class="qual-table-wrap simple-table-wrap"><table class="qual-table simple-qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div><div class="qual-warn"><b>Données stabilisées :</b> les enrichissements DPE / BDNB / RNIC / OSM / AUDIT sont réutilisés lorsqu’ils sont déjà fiabilisés. Si tu relances une nouvelle analyse, les recherches de l’analyse précédente sont immédiatement abandonnées et la priorité passe au nouveau jeu de ventes.</div></div>`;
+  if(state.view==='qualifies'&&!state.qual.simpleStarted&&!state.qual.running){state.qual.simpleStarted=true;setTimeout(()=>enrichSimpleDetermination(false),40);}drawMutations();
+};
+
+setView=function(v){state.view=v;document.getElementById('viewSel').value=v;document.getElementById('mapView').classList.toggle('active',v==='carte');document.getElementById('view-vendus').classList.toggle('active',v==='vendus');document.getElementById('view-qualifies').classList.toggle('active',v==='qualifies');document.getElementById('view-comparateur')?.classList.toggle('active',v==='comparateur');if(v==='carte')setTimeout(()=>{map.invalidateSize();drawMutations();fitMap();},60);if(v==='qualifies'&&!state.qual.running){if(state.qual.rows.length)renderQualifiedResults();else renderQualifiedBase();}if(v==='comparateur')renderComparator();};
+
+/* Progression détaillée : chaque nouvelle analyse invalide l'ancienne grâce à enrichmentEpoch. */
+enrichSimpleDetermination=async function(force=false){
+  if(state.qual.running||!state.qual.rows.length)return;const myEpoch=++enrichmentEpoch,alive=()=>myEpoch===enrichmentEpoch;state.qual.simpleStarted=true;state.qual.running=true;
+  try{const rows=[...state.qual.rows];if(force){clearRuntimeEnrichmentCaches();rows.forEach(r=>{const locked=loadCoproDecision(r,r.publicInfo?.banId||r.dpeInfo?.banId||'');clearStableRow(r);r.dpeChecked=false;delete r.dpeInfo;r.publicInfo=locked?{done:false,osmChecked:false,coproDecision:locked,immat:locked.immat||'',immatSource:locked.source||'',errors:[]}:null;r.auditChecked=false;r.auditInfo=null;});}
+    state.qual._fullProgress={dpeDone:rows.filter(r=>r.dpeChecked).length,dpeTotal:rows.length,pubDone:rows.filter(r=>r.publicInfo?.done||r.publicInfo?.errors?.length).length,pubTotal:rows.length,audDone:rows.filter(r=>r.auditChecked).length,audTotal:rows.length};updateFullProgress();if(!alive())return;
+    setStatus(`Tableau affiché · enrichissement DPE en arrière-plan (${rows.length} ventes)…`,'info');
+    const er=await enrichRowsDpe(rows,()=>{if(!alive())return;updateFullProgress(rows.filter(r=>r.dpeChecked).length,rows.length,undefined,undefined,undefined,undefined);const info=document.getElementById('srcInfo');if(info)info.textContent=`DPE ADEME ${rows.filter(r=>r.dpeChecked).length}/${rows.length}…`;},alive);if(!alive())return;
+    state.qual.dpeErrors=er.errors;state.qual.enrichedCount=rows.filter(r=>r.dpeInfo!=null).length;state.qual.enrichedAll=true;renderQualifiedResults();updateFullProgress(rows.filter(r=>r.dpeChecked).length,rows.length);setStatus('DPE chargé · enrichissement BDNB / RNIC / OSM et AUDIT en parallèle…','info');
+    let pd=rows.filter(r=>r.publicInfo?.done||r.publicInfo?.errors?.length).length,ad=rows.filter(r=>r.auditChecked).length;updateFullProgress(undefined,undefined,pd,rows.length,ad,rows.length);
+    const [pe,ae]=await Promise.all([enrichRowsPublic(rows,(d,n)=>{if(!alive())return;pd=d;updateFullProgress(undefined,undefined,pd,n,ad,rows.length);const info=document.getElementById('srcInfo');if(info)info.textContent=`BDNB / RNIC / OSM ${d}/${n}…`;},alive),enrichAllAuditsSimple(rows,(d,n)=>{if(!alive())return;ad=d;updateFullProgress(undefined,undefined,pd,rows.length,ad,n);},alive)]);if(!alive())return;
+    state.qual.publicErrors+=pe.errors;state.qual.auditErrors+=ae.errors;state.qual.publicEnrichedCount=rows.filter(r=>r.publicInfo?.done).length;state.qual.publicEnrichedAll=true;state.qual.auditEnrichedCount=rows.filter(r=>r.auditChecked).length;state.qual.auditEnrichedAll=true;updateFullProgress(rows.length,rows.length,rows.length,rows.length,rows.length,rows.length);renderQualifiedResults();if(state.view==='comparateur')renderComparator();const c=simpleEnrichmentCounts();setStatus(`Analyse enrichie : ${c.total} ventes · ${c.dpe} DPE · ${c.public} données publiques · ${c.audit} audits vérifiés.`,'ok');
+  }catch(e){if(alive()){console.error(e);setStatus('Enrichissement du tableau : '+e.message,'err');}}finally{if(alive())state.qual.running=false;}
+};
+
+</script>
+
+<script id="selectionPdfPatch">
+/* ============================================================
+   PATCH - sélection finale + filtres allégés + export PDF
+   ============================================================ */
+
+/* Plus de filtre Année de construction. */
+filterBarHtml=function(){
+  const f=normalizeManualFilterState(state.qual.filters||{}),showFloor=shouldShowFloor();
+  return `<div class="qual-filterbar simple-filters">
+    <div class="qf qf-wide"><label>DPE</label>${multiChoiceHtml('qfDpe',[...DPE_ORDER.map(x=>[x,x]),['UNKNOWN','Inconnu']],f.dpe)}</div>
+    <div class="qf qf-wide"><label>Pièces</label>${multiChoiceHtml('qfPieces',[['1','1'],['2','2'],['3','3'],['4','4'],['5','5'],['6plus','6+'],['UNKNOWN','Inconnu']],f.pieces)}</div>
+    ${showFloor?`<div class="qf"><label>Étage</label><select id="qfFloor" onchange="refreshQualifiedView()"><option value="all" ${f.floor==='all'?'selected':''}>Tous</option><option value="rdc" ${f.floor==='rdc'?'selected':''}>RDC</option><option value="1" ${f.floor==='1'?'selected':''}>1er</option><option value="2plus" ${f.floor==='2plus'?'selected':''}>2e et +</option><option value="unknown" ${f.floor==='unknown'?'selected':''}>Inconnu</option></select></div>`:''}
+    <div class="qf"><label>Copropriété</label><select id="qfCopro" onchange="refreshQualifiedView()"><option value="all" ${f.copro==='all'?'selected':''}>Tous</option><option value="yes" ${f.copro==='yes'?'selected':''}>Oui</option><option value="no" ${f.copro==='no'?'selected':''}>Non détectée</option><option value="unknown" ${f.copro==='unknown'?'selected':''}>Inconnu</option></select></div>
+    <div class="qf"><label>Terrain</label><select id="qfTerrain" onchange="refreshQualifiedView()"><option value="all" ${f.terrain==='all'?'selected':''}>Tous</option><option value="yes" ${f.terrain==='yes'?'selected':''}>Avec terrain</option><option value="no" ${f.terrain==='no'?'selected':''}>Sans terrain</option></select></div>
+    <button class="qual-secondary" onclick="resetQualifiedFilters()">Réinitialiser</button>
+  </div>`;
 };
 
 qualifiedFilteredRows=function(applySort=true){
@@ -1448,10 +2255,10 @@ function toggleAllDisplayedFromHeader(checked){setDisplayedPriceSelection(!!chec
 /* Colonne Budget travaux préconisés supprimée. */
 qualifiedTableHtml=function(rows){
   const showFloor=shouldShowFloor(),cols=showFloor?19:18;
-  let h=`<thead><tr><th class="keep-head"><label class="keep-all-wrap" title="Tout sélectionner / désélectionner dans les ventes affichées"><input id="keepAllDisplayed" type="checkbox" onchange="toggleAllDisplayedFromHeader(this.checked)"><span>Garder</span></label></th>${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${showFloor?qualHeader('floor','Étage'):''}<th>Fiabilité</th>${qualHeader('copro','Copropriété')}${qualHeader('terrain','Terrain','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('ppm','€/m²','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;
+  let h=`<thead><tr><th class="keep-head"><label class="keep-all-wrap" title="Tout sélectionner / désélectionner dans les ventes affichées"><input id="keepAllDisplayed" type="checkbox" onchange="toggleAllDisplayedFromHeader(this.checked)"><span>Garder</span></label></th>${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${showFloor?qualHeader('floor','Étage'):''}<th>Fiabilité</th>${qualHeader('copro','Copropriété')}${qualHeader('terrain','Terrain','num')}<th>Équipements / extérieurs</th>${qualHeader('works','Travaux / source')}${qualHeader('val','Prix vendu','num')}${qualHeader('ppm','€/m²','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;
   rows.forEach(r=>{
     const di=r.dpeInfo,keep=priceRowIsKept(r),sk=encodeURIComponent(stableRowId(r));
-    h+=`<tr data-sync-key="${sk}" class="${keep?'price-kept':'price-excluded'} ${state.qual.mapFocusKey===sk?'sync-focus':''}" onmouseenter="syncTableHover('${sk}',true)" onmouseleave="syncTableHover('${sk}',false)"><td class="keep-head"><input class="price-keep" type="checkbox" ${keep?'checked':''} onchange="togglePriceKeep('${encodeURIComponent(rowKey(r))}')" title="Inclure ce bien dans le Prix global médian"></td><td>${r.date?.slice(0,7)||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td>${showFloor?`<td>${floorLabel(di?.floor)}</td>`:''}<td>${reliabilityHtml(r)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;
+    h+=`<tr data-sync-key="${sk}" class="${keep?'price-kept':'price-excluded'} ${state.qual.mapFocusKey===sk?'sync-focus':''}" onmouseenter="syncTableHover('${sk}',true)" onmouseleave="syncTableHover('${sk}',false)"><td class="keep-head"><input class="price-keep" type="checkbox" ${keep?'checked':''} onchange="togglePriceKeep('${encodeURIComponent(rowKey(r))}')" title="Inclure ce bien dans le Prix global médian"></td><td>${r.date?.slice(0,7)||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td>${showFloor?`<td>${floorLabel(di?.floor)}</td>`:''}<td>${reliabilityHtml(r)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td>${freeFeaturesHtml(r)}</td><td>${simpleWorksCellHtml(r)}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;
   });
   if(!rows.length)h+=`<tr><td colspan="${cols}" style="padding:28px;text-align:center"><b>Aucune vente ne correspond aux filtres actuels.</b><br><span class="conf" style="display:block;margin-top:6px">Clique « Réinitialiser » pour afficher toutes les ventes de l’analyse.</span></td></tr>`;
   return h+'</tbody>';
