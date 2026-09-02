@@ -3323,6 +3323,15 @@ enrichSimpleDetermination=async function(force=false){
 /* ============================================================
    PATCH - sélection finale + filtres allégés + export PDF
    ============================================================ */
+function simpleEnrichmentCounts(){
+  const rows=state.qual.rows||[];return{
+    total:rows.length,
+    dpe:rows.filter(r=>r.dpeChecked).length,
+    public:rows.filter(r=>r.publicInfo?.done).length,
+    audit:rows.filter(r=>r.auditChecked).length
+  };
+}
+
 
 /* Plus de filtre Année de construction. */
 filterBarHtml=function(){
