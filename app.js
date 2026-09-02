@@ -1537,25 +1537,26 @@ function multiChoiceHtml(name,values,current){
 }
 function filterBarHtml(){
   const f=normalizeManualFilterState(state.qual.filters||{}),showFloor=shouldShowFloor();
+  const pill=(name,v,l,active)=>`<label style="display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:5px;border:1.5px solid ${active?'#7D721A':'#E5E4DF'};background:${active?'#F7F4E6':'#fff'};color:${active?'#7D721A':'#3A3A36'};font-size:11px;font-weight:700;cursor:pointer;transition:all .12s"><input type="checkbox" name="${name}" value="${v}" ${active?'checked':''} onchange="refreshQualifiedView()" style="display:none">${l}</label>`;
   const dpeVals=[...DPE_ORDER.map(x=>[x,x]),['UNKNOWN','?']];
-  const pieceVals=[['1','1'],['2','2'],['3','3'],['4','4'],['5','5'],['6plus','6+'],['UNKNOWN','?']];
-  return `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-md);margin:8px 0">
-    <span style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">DPE</span>
-    <div style="display:flex;flex-wrap:wrap;gap:3px">${dpeVals.map(([v,l])=>`<label style="display:flex;align-items:center;gap:2px;font-size:10.5px;font-weight:600;cursor:pointer;padding:2px 6px;border:1px solid var(--border);border-radius:99px;background:${(f.dpe||[]).includes(v)?'var(--olive-100)':'var(--surface)'};color:${(f.dpe||[]).includes(v)?'var(--olive)':'var(--text-2)'}"><input type="checkbox" name="qfDpe" value="${v}" ${(f.dpe||[]).includes(v)?'checked':''} onchange="refreshQualifiedView()" style="width:10px;height:10px;accent-color:var(--olive)">${l}</label>`).join('')}</div>
-    <span style="color:var(--border);margin:0 2px">|</span>
-    <span style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Pièces</span>
-    <div style="display:flex;flex-wrap:wrap;gap:3px">${pieceVals.map(([v,l])=>`<label style="display:flex;align-items:center;gap:2px;font-size:10.5px;font-weight:600;cursor:pointer;padding:2px 6px;border:1px solid var(--border);border-radius:99px;background:${(f.pieces||[]).includes(v)?'var(--olive-100)':'var(--surface)'};color:${(f.pieces||[]).includes(v)?'var(--olive)':'var(--text-2)'}"><input type="checkbox" name="qfPieces" value="${v}" ${(f.pieces||[]).includes(v)?'checked':''} onchange="refreshQualifiedView()" style="width:10px;height:10px;accent-color:var(--olive)">${l}</label>`).join('')}</div>
-    <span style="color:var(--border);margin:0 2px">|</span>
-    ${showFloor?`<span style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Étage</span><select id="qfFloor" onchange="refreshQualifiedView()" style="padding:2px 6px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:11.5px;background:var(--surface)"><option value="all" ${f.floor==='all'?'selected':''}>Tous</option><option value="rdc" ${f.floor==='rdc'?'selected':''}>RDC</option><option value="1" ${f.floor==='1'?'selected':''}>1er</option><option value="2plus" ${f.floor==='2plus'?'selected':''}>2e+</option><option value="unknown" ${f.floor==='unknown'?'selected':''}>Inconnu</option></select><span style="color:var(--border);margin:0 2px">|</span>`:''}
-    <span style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Copro</span>
-    <select id="qfCopro" onchange="refreshQualifiedView()" style="padding:2px 6px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:11.5px;background:var(--surface)"><option value="all" ${f.copro==='all'?'selected':''}>Tous</option><option value="yes" ${f.copro==='yes'?'selected':''}>Oui</option><option value="no" ${f.copro==='no'?'selected':''}>Non</option><option value="unknown" ${f.copro==='unknown'?'selected':''}>Inconnu</option></select>
-    <span style="color:var(--border);margin:0 2px">|</span>
-    <span style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Terrain</span>
-    <select id="qfTerrain" onchange="refreshQualifiedView()" style="padding:2px 6px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:11.5px;background:var(--surface)"><option value="all" ${f.terrain==='all'?'selected':''}>Tous</option><option value="yes" ${f.terrain==='yes'?'selected':''}>Avec</option><option value="no" ${f.terrain==='no'?'selected':''}>Sans</option></select>
-    <button onclick="resetQualifiedFilters()" style="margin-left:4px;padding:2px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);font-size:11px;font-weight:600;color:var(--text-2);cursor:pointer">↺ Réinitialiser</button>
+  const pieceVals=[['1','1p'],['2','2p'],['3','3p'],['4','4p'],['5','5p'],['6plus','6p+'],['UNKNOWN','?']];
+  const dpe=f.dpe||[];const pieces=f.pieces||[];
+  return `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 12px;background:#F7F4E6;border:1px solid #E3DCBE;border-radius:8px;margin:8px 0">
+    <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">DPE</span>
+    ${dpeVals.map(([v,l])=>pill('qfDpe',v,l,dpe.includes(v))).join('')}
+    <span style="color:#E5E4DF;margin:0 4px">|</span>
+    <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Pièces</span>
+    ${pieceVals.map(([v,l])=>pill('qfPieces',v,l,pieces.includes(v))).join('')}
+    ${showFloor?`<span style="color:#E5E4DF;margin:0 4px">|</span><span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Étage</span><select id="qfFloor" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;font-weight:700;background:#fff;color:#191917"><option value="all" ${f.floor==='all'?'selected':''}>Tous</option><option value="rdc" ${f.floor==='rdc'?'selected':''}>RDC</option><option value="1" ${f.floor==='1'?'selected':''}>1er</option><option value="2plus" ${f.floor==='2plus'?'selected':''}>2e+</option><option value="unknown" ${f.floor==='unknown'?'selected':''}>?</option></select>`:''}
+    <span style="color:#E5E4DF;margin:0 4px">|</span>
+    <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Copro</span>
+    <select id="qfCopro" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;font-weight:700;background:#fff;color:#191917"><option value="all" ${f.copro==='all'?'selected':''}>Tous</option><option value="yes" ${f.copro==='yes'?'selected':''}>Oui</option><option value="no" ${f.copro==='no'?'selected':''}>Non</option><option value="unknown" ${f.copro==='unknown'?'selected':''}>?</option></select>
+    <span style="color:#E5E4DF;margin:0 4px">|</span>
+    <span style="font-size:9px;font-weight:800;color:#6B6A65;text-transform:uppercase;letter-spacing:.6px;margin-right:2px">Terrain</span>
+    <select id="qfTerrain" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;font-weight:700;background:#fff;color:#191917"><option value="all" ${f.terrain==='all'?'selected':''}>Tous</option><option value="yes" ${f.terrain==='yes'?'selected':''}>Avec</option><option value="no" ${f.terrain==='no'?'selected':''}>Sans</option></select>
+    <button onclick="resetQualifiedFilters()" style="margin-left:6px;padding:3px 10px;border:1.5px solid #E5E4DF;border-radius:5px;background:#fff;font-size:11px;font-weight:700;color:#6B6A65;cursor:pointer">↺</button>
   </div>`;
 }
-
 function refreshQualifiedView(){
   const current=normalizeManualFilterState(state.qual.filters||{});
   state.qual.filters={
