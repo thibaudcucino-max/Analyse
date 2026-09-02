@@ -333,10 +333,10 @@ input[type=range]::-moz-range-thumb {
 .ac-item .ctx { color: var(--muted); font-size: 10.5px; }
 
 /* ── Content ── */
-.content { flex: 1; overflow-y: auto; position: relative; background: var(--bg); }
-#mapView { position: absolute; inset: 0; display: none; }
+.content { flex: 1; overflow: hidden; position: relative; background: var(--bg); }
+#mapView { position: absolute; inset: 0; display: none; overflow: hidden; }
 #map { width: 100%; height: 100%; }
-.dashboard { padding: 28px 32px; display: none; }
+.dashboard { padding: 20px 24px; display: none; overflow-y: auto; height: 100%; }
 .dashboard.active { display: block; }
 #mapView.active { display: block; }
 
@@ -1029,7 +1029,15 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
 .keep-all-wrap { display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; }
 .keep-all-wrap input { width: 16px; height: 16px; accent-color: var(--olive); cursor: pointer; }
 .keep-all-wrap span { font-size: 9px; font-weight: 700; letter-spacing: .02em; color: var(--muted); }
-.keep-actions button { min-width: 120px; }
+.keep-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.keep-actions button { 
+  padding: 5px 12px; border-radius: 6px; 
+  border: 1.5px solid rgba(255,255,255,.25); 
+  background: rgba(255,255,255,.12); 
+  color: #fff; font-size: 11.5px; font-weight: 700; 
+  cursor: pointer; transition: all .12s;
+}
+.keep-actions button:hover { background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.4); }
 
 /* ── Misc ── */
 .dpebadge { padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 700; font-size: 11px; display: inline-block; }
@@ -1126,7 +1134,7 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
 .keep-all-wrap{display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
 .keep-all-wrap input{width:17px;height:17px;accent-color:#caa738;cursor:pointer}
 .keep-all-wrap span{font-size:9px;font-weight:900;letter-spacing:.02em}
-.keep-actions button{min-width:126px}
+.keep-actions{display:flex;gap:8px;flex-wrap:wrap}.keep-actions button{padding:5px 12px;border-radius:6px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#fff;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .12s}.keep-actions button:hover{background:rgba(255,255,255,.22)}
 </style>
 
 
@@ -1842,7 +1850,7 @@ function renderVendus(){
     <div class="darkbar" onclick="toggleCollapse('mutList',this)"><span class="caret">▶</span> <span id="mutLabel">Liste des mutations (${S.length} sélectionnées / ${state.filtered.length} total)</span></div>
     <div class="collapse closed" id="mutList">
       <div class="tbl-head" style="margin-top:10px;display:flex;align-items:center;gap:10px">
-        <button id="selBtn" onclick="toggleAll()" style="padding:4px 12px;border-radius:6px;border:1.5px solid #E5E4DF;background:#fff;color:#3A3A36;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .12s">${S.length===state.filtered.length?'✕ Tout désélectionner':'✓ Tout sélectionner'} <span style="color:#6B6A65;font-weight:500">(${S.length}/${state.filtered.length})</span></button>
+        <button id="selBtn" onclick="toggleAll()" style="padding:4px 12px;border-radius:6px;border:1.5px solid #E5E4DF;background:#fff;color:#3A3A36;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .12s">${S.length===state.filtered.length?'✕ Tout désélectionner':'✓ Tout garder'} <span style="color:#6B6A65;font-weight:500">(${S.length}/${state.filtered.length})</span></button>
       </div>
       <div class="tbl-scroll"><table id="mutTable">${mutTableHtml()}</table></div>
     </div>
@@ -3569,8 +3577,8 @@ qualifiedTableHtml=function(rows){
 const _simpleGlobalPriceHtmlSelectionPdf=simpleGlobalPriceHtml;
 simpleGlobalPriceHtml=function(rows){
   return _simpleGlobalPriceHtmlSelectionPdf(rows)
-    .replace('✓ Garder tous les biens affichés','✓ Tout sélectionner')
-    .replace('× Tout retirer','× Tout désélectionner');
+    .replace('✓ Garder tous les biens affichés','✓ Tout garder')
+    .replace('× Tout retirer','× Tout retirer');
 };
 
 refreshQualifiedView=function(){
