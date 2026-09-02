@@ -3323,6 +3323,91 @@ enrichSimpleDetermination=async function(force=false){
 /* ============================================================
    PATCH - sélection finale + filtres allégés + export PDF
    ============================================================ */
+
+/* Fonctions manquantes réinjectées */
+function editQualifiedTarget(){state.qual.rows=[];state.qual.targetPublic=null;state.qual.targetAudit=null;renderQualifiedBase();}
+
+
+
+
+/* =========================================================
+   DÉTERMINATION DU PRIX — MODE TABLEAU SIMPLE
+   Toutes les ventes conservées dans l'analyse sont affichées. Aucun score,
+   aucun Top 5 et aucun prix cible automatique : l'utilisateur
+   arbitre directement avec les filtres et les tris.
+   ========================================================= */
+
+function simpleEnrichmentCounts(){
+  const rows=state.qual.rows||[];return{
+    total:rows.length,
+    dpe:rows.filter(r=>r.dpeChecked).length,
+    public:rows.filter(r=>r.publicInfo?.done).length,
+    audit:rows.filter(r=>r.auditChecked).length
+  };
+}
+
+async function enrichSimpleDetermination(force=false){
+  if(state.qual.running||!state.qual.rows.length)return;
+  state.qual.simpleStarted=true;state.qual.running=true;
+  try{
+    const rows=state.qual.rows;
+    if(force){
+      clearRuntimeEnrichmentCaches();
+      rows.forEach(r=>{const locked=loadCoproDecision(r,r.publicInfo?.banId||r.dpeInfo?.banId||'');clearStableRow(r);r.dpeChecked=false;delete r.dpeInfo;r.publicInfo=locked?{done:false,osmChecked:false,coproDecision:locked,immat:locked.immat||'',immatSource:locked.source||'',errors:[]}:null;r.auditChecked=false;r.auditInfo=null;});
+    }
+    setStatus(`Tableau affiché · enrichissement DPE en arrière-plan (${rows.length} ventes)…`,'info');
+    const er=await enrichRowsDpe(rows,(d,n,e)=>{const info=document.getElementById('srcInfo');if(info)info.textContent=`DPE ADEME ${d}/${n}${e?' · '+e+' erreur(s)':''}…`;});
+    state.qual.dpeErrors=er.errors;state.qual.enrichedCount=rows.filter(r=>r.dpeInfo!=null).length;state.qual.enrichedAll=true;
+    renderQualifiedResults();
+    setStatus(`DPE chargé · enrichissement copropriété / équipements / travaux en parallèle…`,'info');
+    const [pe,ae]=await Promise.all([
+      enrichRowsPublic(rows,(d,n)=>{const info=document.getElementById('srcInfo');if(info)info.textContent=`BDNB / RNIC / OSM ${d}/${n}…`;}),
+      enrichAllAuditsSimple(rows,(d,n)=>{const el=document.getElementById('simpleProgress');if(el)el.textContent=`AUDIT ADEME ${d}/${n}…`;})
+    ]);
+    state.qual.publicErrors+=pe.errors;state.qual.auditErrors+=ae.errors;
+    state.qual.publicEnrichedCount=rows.filter(r=>r.publicInfo?.done).length;state.qual.publicEnrichedAll=state.qual.publicEnrichedCount>=rows.length;
+    state.qual.auditEnrichedCount=rows.filter(r=>r.auditChecked).length;state.qual.auditEnrichedAll=state.qual.auditEnrichedCount>=rows.length;
+    renderQualifiedResults();
+    const c=simpleEnrichmentCounts();
+    setStatus(`Tableau enrichi : ${c.total} ventes · ${c.dpe} DPE · ${c.public} données bâtiment/copro/OSM · ${c.audit} audits vérifiés.`,'ok');
+  }catch(e){console.error(e);setStatus('Enrichissement du tableau : '+e.message,'err');}
+  finally{state.qual.running=false;}
+}
+
+function simpleWorkBudget(r){
+  const m=manualWorkBudget(r);if(isFinite(m))return{value:m,source:'manual',confirmed:true};
+  const a=r?.auditInfo;
+  // Un montant AUDIT n'est affiché comme exploitable que si le rapprochement
+  // adresse + surface + temporalité est classé "high".
+  if(a&&isFinite(a.costMid)&&a.costMid>0){
+    if(a.confidence==='high')return{value:a.costMid,source:'audit',confirmed:true};
+    return{value:NaN,source:'audit_unconfirmed',confirmed:false,rawValue:a.costMid};
+  }
+  return{value:NaN,source:a?'audit_no_cost':'none',confirmed:false};
+}
+
+function simpleWorksCellHtml(r){
+  const a=r?.auditInfo,b=simpleWorkBudget(r),e=energyWorksInfo(r),chips=[];
+  if(a){
+    const certain=a.confidence==='high';
+    chips.push(`<span class="work-pill ${certain?'audit':'unknown'}">${certain?'Audit ADEME rapproché':'Audit ADEME possible'}</span>`);
+    if(a?.works?.length&&certain)chips.push(`<span class="work-pill audit">${esc(a.works[0])}</span>`);
+    if(b.source==='audit'&&isFinite(b.value)&&b.value>0)chips.push(`<span class="work-pill audit">Travaux préconisés · ${eur(b.value)}</span>`);
+    else if(b.source==='audit_unconfirmed')chips.push(`<span class="work-pill unknown">Budget à confirmer</span>`);
+  }else{
+    chips.push(`<span class="work-pill ${e.cls}">${esc(e.label)}</span>`);
+  }
+  return `<div class="work-stack"><div class="work-line">${chips.join('')}</div>${a?.date?`<span class="work-sub">Audit du ${esc(a.date)} · ${confidenceLabel(a.confidence)}${a.confidence!=='high'?' · montant non retenu':''}</span>`:''}<button class="work-edit" onclick="openWorkModal('${encodeURIComponent(rowKey(r))}')">✎ Détails travaux</button></div>`;
+}
+
+async function enrichAllAuditsSimple(rows,progress){
+  const todo=rows.filter(r=>!r.auditChecked);let done=0,errors=0,cursor=0;
+  async function worker(){while(cursor<todo.length){const r=todo[cursor++];try{r.auditInfo=await lookupAuditForRow(r);r.auditChecked=true;saveStableRow(r);}catch(e){errors++;r.auditInfo=null;r.auditChecked=false;}done++;progress?.(done,todo.length,errors);await sleep(150);}}
+  await Promise.all(Array.from({length:Math.min(3,todo.length)},worker));return{count:todo.length,errors};
+}
+
+function toggleQualified(encoded){const k=decodeURIComponent(encoded),r=state.qual.rows.find(x=>rowKey(x)===k);if(!r)return;r.qSelected=!r.qSelected;renderQualifiedResults();}
+
 function simpleEnrichmentCounts(){
   const rows=state.qual.rows||[];return{
     total:rows.length,
