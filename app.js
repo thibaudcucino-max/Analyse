@@ -500,8 +500,8 @@ function renderVendus(){
   </div>
 
   <div class="block">
-    <div class="darkbar" onclick="toggleCollapse('mutList',this)"><span class="caret">▶</span> <span id="mutLabel">Liste des mutations (${S.length} sélectionnées / ${state.filtered.length} total)</span></div>
-    <div class="collapse closed" id="mutList">
+    <div class="darkbar" onclick="toggleCollapse('mutList',this)"><span class="caret">▼</span> <span id="mutLabel">Liste des mutations (${S.length} sélectionnées / ${state.filtered.length} total)</span></div>
+    <div class="collapse" id="mutList">
       <div class="tbl-head" style="margin-top:12px">
         <button class="mini-btn" id="selBtn" onclick="toggleAll()">${S.length===state.filtered.length?'Tout désélectionner':'Tout sélectionner'} (${S.length} / ${state.filtered.length})</button>
       </div>
