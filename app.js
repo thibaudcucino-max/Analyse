@@ -1206,6 +1206,11 @@ function filterBarHtml(){
     <button onclick="resetQualifiedFilters()" style="margin-left:6px;padding:3px 10px;border:1.5px solid #E5E4DF;border-radius:5px;background:#fff;font-size:11px;font-weight:700;color:#6B6A65;cursor:pointer">↺</button>
   </div>`;
 }
+function targetMatchNote(){const t=state.qual.target||{},m=state.qual.targetMatch,resolved=resolveTarget(t);if(!m&&t.dpe==='AUTO')return`Aucun DPE suffisamment fiable n’a été rapproché automatiquement du bien cible. Les critères publics inconnus ne pénalisent pas le score.`;let txt=`DPE : ${dpeBadge(resolved.dpe)} · Construction : <b>${periodLabel(resolved.period)}</b>`;if(isFinite(resolved.floor))txt+=` · Étage : <b>${floorLabel(resolved.floor)}</b>`;if(resolved.traversant!==null)txt+=` · Traversant : <b>${boolLabel(resolved.traversant)}</b>`;if(resolved.orientation)txt+=` · Orientation : <b>${resolved.orientation}</b>`;if(t.type==='Maison'&&resolved.copro!==null){const auto=t.copro==='AUTO',lab=resolved.copro?'Oui':'Non détectée';txt+=` · Copropriété : <b>${lab}${auto?' (auto)':''}</b>`;}if(m?.date)txt+=` · DPE du ${esc(m.date)}`;return txt+'.';}
+function renderQualifiedResults(){const body=document.getElementById('qualBody');if(!body||!state.qual.rows.length){renderQualifiedBase();return;}const source=qualifiedSourceRows(),baseRows=qualifiedFilteredRows(false),rows=qualifiedSortRows(baseRows),top=[...baseRows].sort((a,b)=>b.qScore-a.qScore||(a.dist-b.dist)).slice(0,5);const remainingDpe=state.qual.enrichedAll?'':`<button class="qual-secondary" onclick="runQualifiedRanking(true)">Enrichir tous les DPE (${source.length})</button>`,remainingPublic=state.qual.publicEnrichedAll?'':`<button class="qual-secondary" onclick="enrichQualifiedPublic(true)">Enrichir toutes les données publiques (${source.length})</button>`,remainingAudit=state.qual.auditEnrichedAll?'':`<button class="qual-secondary" onclick="enrichQualifiedWorks(true)">Enrichir tous les AUDITS travaux (${source.length})</button>`;body.innerHTML=`<div class="qual-hero"><div><h2>Détermination du prix</h2><p>Étape 1 ter : le prix DVF reste intact, puis une seconde lecture calcule un €/m² corrigé selon l’état intérieur (%) et/ou le budget travaux.</p></div><div class="qual-source">${Math.min(state.qual.enrichedCount,source.length)}/${source.length} DPE · ${source.filter(r=>r.publicInfo?.done).length}/${source.length} public · ${source.filter(r=>r.auditChecked).length}/${source.length} audit</div></div>
+  <div class="qual-panel"><h3>Bien à estimer</h3><div class="subtxt">${esc(state.addresses[0]?.label||'')}</div><div class="target-dpe-note">${targetMatchNote()}</div>${targetPublicSummaryHtml()}${targetWorksSummaryHtml()}<div class="qual-actions"><button class="qual-secondary" onclick="editQualifiedTarget()">Modifier les caractéristiques / travaux</button><button class="qual-secondary" onclick="openTargetPublicModal()">Voir les données publiques cible</button>${remainingDpe}${remainingPublic}${remainingAudit}</div></div>
+  ${qualifiedSummaryHtml()}
+  <div class="qual-panel"><h3>Top 5 des comparables</h3><div class="subtxt">L’état et son coefficient restent modifiables via « ✎ État / travaux », sans encombrer le tableau. La colonne Travaux conserve le budget éventuel et la correction appliquée.</div><div class="qual-top">${top.length?top.map(qualCardHtml).join(''):'<div class="placeholder">Aucun comparable avec les filtres actuels.</div>'}</div>${filterBarHtml()}<div class="qual-table-wrap"><table class="qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div><div class="qual-warn">Correction prix : le coefficient d’état est calculé par différence entre l’état cible et l’état du comparable. Barème par défaut : neuf +12 %, très bon +7 %, bon 0 %, à rafraîchir −5 %, à rénover −12 %. Tous ces pourcentages sont modifiables. Le mode « État + budget » cumule volontairement les deux corrections : utilise-le seulement si tu veux éviter qu’elles décrivent deux fois les mêmes travaux. La valeur DVF d’origine reste toujours intacte.</div></div>${dpeMarketHtml()}`;}
 function refreshQualifiedView(){state.qual.filters={dpe:document.getElementById('qfDpe')?.value||'all',surface:document.getElementById('qfSurface')?.value||'all',pieces:document.getElementById('qfPieces')?.value||'all',period:document.getElementById('qfPeriod')?.value||'all',distance:document.getElementById('qfDistance')?.value||'all',recency:document.getElementById('qfRecency')?.value||'all',mutation:document.getElementById('qfMutation')?.value||'all',floor:document.getElementById('qfFloor')?.value||'all',traversant:document.getElementById('qfTraversant')?.value||'all',copro:document.getElementById('qfCopro')?.value||'all',interior:document.getElementById('qfInterior')?.value||'all',works:document.getElementById('qfWorks')?.value||'all'};const baseRows=qualifiedFilteredRows(false),rows=qualifiedSortRows(baseRows),tbl=document.getElementById('qualTable');if(tbl)tbl.innerHTML=qualifiedTableHtml(rows);const top=document.querySelector('.qual-top');if(top){const topRows=[...baseRows].sort((a,b)=>b.qScore-a.qScore||(a.dist-b.dist)).slice(0,5);top.innerHTML=topRows.map(qualCardHtml).join('')||'<div class="placeholder">Aucun comparable avec les filtres actuels.</div>';}}
 function resetQualifiedFilters(){state.qual.filters={dpe:'all',surface:'all',pieces:'all',period:'all',distance:'all',recency:'all',mutation:'all',floor:'all',traversant:'all',copro:'all',interior:'all',works:'all'};['qfDpe','qfSurface','qfPieces','qfPeriod','qfDistance','qfRecency','qfMutation','qfFloor','qfTraversant','qfCopro','qfInterior','qfWorks'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='all';});refreshQualifiedView();}
 function toggleQualified(encoded){const k=decodeURIComponent(encoded),r=state.qual.rows.find(x=>rowKey(x)===k);if(!r)return;r.qSelected=!r.qSelected;renderQualifiedResults();}
@@ -1372,6 +1377,184 @@ function filterBarHtml(){
     <select id="qfTerrain" onchange="refreshQualifiedView()" style="padding:3px 6px;border:1.5px solid #E5E4DF;border-radius:5px;font-size:11px;font-weight:700;background:#fff;color:#191917"><option value="all" ${f.terrain==='all'?'selected':''}>Tous</option><option value="yes" ${f.terrain==='yes'?'selected':''}>Avec</option><option value="no" ${f.terrain==='no'?'selected':''}>Sans</option></select>
     <button onclick="resetQualifiedFilters()" style="margin-left:6px;padding:3px 10px;border:1.5px solid #E5E4DF;border-radius:5px;background:#fff;font-size:11px;font-weight:700;color:#6B6A65;cursor:pointer">↺</button>
   </div>`;
+}
+function refreshQualifiedView(){
+  const get=id=>document.getElementById(id)?.value||'all';
+  state.qual.filters={type:get('qfType'),dpe:get('qfDpe'),surface:get('qfSurface'),pieces:get('qfPieces'),period:get('qfPeriod'),floor:get('qfFloor'),copro:get('qfCopro'),terrain:get('qfTerrain'),equipment:get('qfEquipment'),works:get('qfWorks'),distance:get('qfDistance'),recency:get('qfRecency'),mutation:get('qfMutation'),ppmMin:document.getElementById('qfPpmMin')?.value||'',ppmMax:document.getElementById('qfPpmMax')?.value||''};
+  const rows=qualifiedFilteredRows(true),tbl=document.getElementById('qualTable');if(tbl)tbl.innerHTML=qualifiedTableHtml(rows);const c=document.getElementById('qualVisibleCount');if(c)c.textContent=`${rows.length} / ${state.qual.rows.length} ventes affichées`;const gp=document.getElementById('simpleGlobalPrice');if(gp)gp.innerHTML=simpleGlobalPriceHtml(rows);
+}
+function resetQualifiedFilters(){state.qual.filters={type:'all',dpe:'all',surface:'all',pieces:'all',period:'all',floor:'all',copro:'all',terrain:'all',equipment:'all',works:'all',distance:'all',recency:'all',mutation:'all',ppmMin:'',ppmMax:''};renderQualifiedResults();}
+
+function simpleGlobalPriceStats(rows){
+  const vals=rows.map(r=>r.val).filter(v=>isFinite(v)&&v>0),ppms=rows.map(r=>r.ppm).filter(v=>isFinite(v)&&v>0);
+  return{count:rows.length,price:median(vals),ppm:median(ppms)};
+}
+function simpleGlobalPriceHtml(rows){
+  const st=simpleGlobalPriceStats(rows);
+  return `<div class="simple-global-price-card"><div><div class="sgp-label">Prix global médian</div><div class="sgp-value">${isFinite(st.price)?eur(st.price):'—'}</div></div><div class="sgp-meta"><b>${st.count}</b> vente${st.count>1?'s':''} affichée${st.count>1?'s':''}<br>€/m² médian : <b>${isFinite(st.ppm)?ppmF(st.ppm):'—'}</b><br><span>Recalculé automatiquement selon les filtres.</span></div></div>`;
+}
+
+function renderQualifiedResults(){
+  const body=document.getElementById('qualBody');if(!body)return;if(!state.qual.rows.length){renderQualifiedBase();return;}
+  const source=qualifiedSourceRows();if(source.length!==state.qual.rows.length||source.some((r,i)=>rowKey(r)!==rowKey(state.qual.rows[i]))){state.qual.simpleStarted=false;renderQualifiedBase();return;}
+  const rows=qualifiedFilteredRows(true),c=simpleEnrichmentCounts();
+  body.innerHTML=`<div class="qual-hero simple-qual-hero"><div><h2>Détermination du prix</h2><p>Toutes les ventes issues de l’analyse sont regroupées ici. Trie et filtre les caractéristiques pour retenir mentalement les références les plus pertinentes.</p></div><div class="qual-source">${c.total} VENTES · ${c.dpe} DPE · ${c.public} PUBLIC</div></div>
+  <div class="qual-panel simple-table-panel"><div class="simple-table-head"><div><h3>Tableau des ventes analysées</h3><div class="subtxt">Aucun score ni prix cible automatique : les données DVF restent brutes et les caractéristiques publiques servent uniquement à ton appréciation.</div></div><div class="simple-head-actions"><span id="qualVisibleCount" class="visible-count">${rows.length} / ${state.qual.rows.length} ventes affichées</span><span id="simpleProgress" class="qual-progress"></span><button class="qual-secondary" onclick="enrichSimpleDetermination(true)">Actualiser depuis les sources</button></div></div><div id="simpleGlobalPrice">${simpleGlobalPriceHtml(rows)}</div>${filterBarHtml()}<div class="qual-table-wrap simple-table-wrap"><table class="qual-table simple-qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div><div class="qual-warn"><b>Données stabilisées :</b> la copropriété est vérifiée séparément et verrouillée dès qu’une immatriculation fiable est confirmée. L’identité du bien est basée sur la mutation DVF + l’adresse, et toutes les parcelles de la mutation sont contrôlées : un changement de parcelle représentative après dédoublonnage ne peut plus déplacer le statut copropriété. Un « Non détectée » n’est retenu qu’après contrôle BDNB concordant par adresse et toutes les parcelles connues. Une copropriété confirmée est mémorisée durablement par mutation/adresse et un simple rafraîchissement ne peut plus la faire disparaître. Un DPE seulement probable ne suffit plus : il doit être confirmé par le RNIC. Les statuts « Non détectée » ne sont jamais verrouillés : en cas de doute ils repassent à « Inconnu ». Les autres enrichissements sont conservés localement pendant 7 jours. « Actualiser depuis les sources » recontrôle les données sans effacer les copropriétés déjà confirmées.</div></div>`;
+  if(state.view==='qualifies'&&!state.qual.simpleStarted&&!state.qual.running){state.qual.simpleStarted=true;setTimeout(()=>enrichSimpleDetermination(false),40);}
+}
+
+
+/* =========================================================
+   MDB — Filtrage manuel + prix médian sélectionné + annulation
+   ========================================================= */
+let enrichmentEpoch=0;
+
+function normalizeManualFilterState(f={}){
+  return {
+    dpe:Array.isArray(f.dpe)?f.dpe:[],
+    pieces:Array.isArray(f.pieces)?f.pieces:[],
+    constructionMin:f.constructionMin||'',
+    constructionMax:f.constructionMax||'',
+    floor:f.floor||'all',
+    copro:f.copro||'all',
+    terrain:f.terrain||'all'
+  };
+}
+function getCheckedValues(name,fallback=[]){
+  const els=[...document.querySelectorAll(`input[name="${name}"]`)];
+  return els.length?els.filter(x=>x.checked).map(x=>x.value):fallback;
+}
+function shouldShowFloor(){
+  return (state.qual.rows||[]).some(r=>r.type==='Appartement');
+}
+function constructionRangeForRow(r){
+  const y=+r?.dpeInfo?.year;
+  if(isFinite(y)&&y>0)return[y,y];
+  const p=r?.dpeInfo?.period;
+  const map={
+    pre1948:[1800,1947],1948_1974:[1948,1974],1975_1988:[1975,1988],
+    1989_2000:[1989,2000],2001_2012:[2001,2012],2013_2020:[2013,2020],post2020:[2021,2200]
+  };
+  return map[p]||[NaN,NaN];
+}
+function constructionInRange(r,min,max){
+  if(!min&&!max)return true;
+  const [lo,hi]=constructionRangeForRow(r);
+  if(!isFinite(lo)||!isFinite(hi))return false;
+  if(min&&hi<min)return false;
+  if(max&&lo>max)return false;
+  return true;
+}
+const PRICE_CONDITIONS=[
+  ['TURNKEY','Clé en main',12],
+  ['VERY_GOOD','Très bon état',7],
+  ['GOOD','Bon état',0],
+  ['REFRESH','À rafraîchir',-5],
+  ['RENOVATE','À rénover',-12],
+  ['HEAVY','Rénovation lourde',-20]
+];
+const PRICE_CONDITION_DEFAULTS=Object.fromEntries(PRICE_CONDITIONS.map(([k,,v])=>[k,v]));
+function ensurePriceConditionState(){
+  if(!state.qual.priceCondition||!Object.prototype.hasOwnProperty.call(PRICE_CONDITION_DEFAULTS,state.qual.priceCondition))state.qual.priceCondition='GOOD';
+  if(!state.qual.conditionAdjustments)state.qual.conditionAdjustments={...PRICE_CONDITION_DEFAULTS};
+  for(const [k,,v] of PRICE_CONDITIONS)if(!isFinite(+state.qual.conditionAdjustments[k]))state.qual.conditionAdjustments[k]=v;
+}
+function priceConditionLabel(k){return PRICE_CONDITIONS.find(x=>x[0]===k)?.[1]||'Bon état';}
+function priceConditionCoef(){ensurePriceConditionState();return Number(state.qual.conditionAdjustments[state.qual.priceCondition]??0);}
+function priceConditionPct(v){v=Number(v)||0;return `${v>0?'+':''}${v.toLocaleString('fr-FR',{maximumFractionDigits:1})} %`;}
+function priceRowIsKept(r){return r.priceSelected!==false;}
+function togglePriceKeep(encoded){
+  const k=decodeURIComponent(encoded),r=(state.qual.rows||[]).find(x=>rowKey(x)===k);
+  if(!r)return;
+  r.priceSelected=!priceRowIsKept(r);
+  refreshQualifiedView();
+}
+function setDisplayedPriceSelection(on){
+  qualifiedFilteredRows(false).forEach(r=>r.priceSelected=!!on);
+  refreshQualifiedView();
+}
+function updateGlobalPriceOutputs(){
+  const st=simpleGlobalPriceStats(qualifiedFilteredRows(true));
+  const main=document.getElementById('sgpMainValue'),base=document.getElementById('sgpBaseValue'),cnt=document.getElementById('sgpSelectedCount'),rppm=document.getElementById('sgpRawPpm'),appm=document.getElementById('sgpAdjustedPpm'),formula=document.getElementById('sgpFormula');
+  if(main)main.textContent=isFinite(st.price)?eur(st.price):'—';
+  if(base)base.textContent=isFinite(st.basePrice)?eur(st.basePrice):'—';
+  if(cnt)cnt.textContent=`${st.kept} bien${st.kept>1?'s':''} gardé${st.kept>1?'s':''}`;
+  if(rppm)rppm.textContent=isFinite(st.rawPpm)?ppmF(st.rawPpm):'—';
+  if(appm)appm.textContent=isFinite(st.adjustedPpm)?ppmF(st.adjustedPpm):'—';
+  if(formula)formula.textContent=isFinite(st.rawPpm)&&isFinite(st.surface)?`${f0(st.surface)} m² × ${ppmF(st.rawPpm)} · ${priceConditionLabel(state.qual.priceCondition)} ${priceConditionPct(st.adj)}`:'Renseigne une surface cible pour calculer le prix global.';
+}
+function setValuationSurface(v){
+  const n=Number(v);state.qual.valuationSurface=isFinite(n)&&n>0?n:NaN;updateGlobalPriceOutputs();
+}
+function setPriceCondition(k){
+  ensurePriceConditionState();if(Object.prototype.hasOwnProperty.call(PRICE_CONDITION_DEFAULTS,k))state.qual.priceCondition=k;
+  const coef=document.getElementById('sgpConditionCoef');if(coef)coef.value=priceConditionCoef();
+  document.querySelectorAll('.sgp-state-chip').forEach(el=>el.classList.toggle('active',el.dataset.condition===state.qual.priceCondition));
+  updateGlobalPriceOutputs();
+}
+function setPriceConditionCoef(v){
+  ensurePriceConditionState();let n=Number(v);if(!isFinite(n))n=0;n=Math.max(-50,Math.min(50,n));
+  state.qual.conditionAdjustments[state.qual.priceCondition]=n;
+  const sel=document.getElementById('sgpCondition');if(sel){const op=sel.querySelector(`option[value="${state.qual.priceCondition}"]`);if(op)op.textContent=`${priceConditionLabel(state.qual.priceCondition)} (${priceConditionPct(n)})`;}
+  updateGlobalPriceOutputs();
+}
+
+function qualifiedFilteredRows(applySort=true){
+  const rows=state.qual.rows||[],f=normalizeManualFilterState(state.qual.filters||{});
+  const dpes=getCheckedValues('qfDpe',f.dpe);
+  const pieces=getCheckedValues('qfPieces',f.pieces);
+  const cMin=+(document.getElementById('qfConstructionMin')?.value||f.constructionMin||0);
+  const cMax=+(document.getElementById('qfConstructionMax')?.value||f.constructionMax||0);
+  const floor=document.getElementById('qfFloor')?.value||f.floor||'all';
+  const copro=document.getElementById('qfCopro')?.value||f.copro||'all';
+  const terrain=document.getElementById('qfTerrain')?.value||f.terrain||'all';
+  const filtered=rows.filter(r=>{
+    if(dpes.length){
+      const d=r.dpeInfo?.dpe||'UNKNOWN';
+      if(!dpes.includes(d))return false;
+    }
+    if(pieces.length){
+      const p=isFinite(r.pieces)?(+r.pieces>=6?'6plus':String(+r.pieces)):'UNKNOWN';
+      if(!pieces.includes(p))return false;
+    }
+    if(!constructionInRange(r,cMin,cMax))return false;
+    if(shouldShowFloor()&&floor!=='all'){
+      const v=r.dpeInfo?.floor;
+      if(floor==='unknown'&&isFinite(v))return false;
+      if(floor!=='unknown'){
+        if(!isFinite(v))return false;
+        if(floor==='rdc'&&+v!==0)return false;
+        if(floor==='1'&&+v!==1)return false;
+        if(floor==='2plus'&&+v<2)return false;
+      }
+    }
+    if(copro!=='all'){
+      const c=publicCoproStatus(r);
+      if(copro==='yes'&&c.value!==true)return false;
+      if(copro==='no'&&c.value!==false)return false;
+      if(copro==='unknown'&&c.value!==null)return false;
+    }
+    if(terrain==='yes'&&!(r.terrain>0))return false;
+    if(terrain==='no'&&r.terrain>0)return false;
+    return true;
+  });
+  return applySort?qualifiedSortRows(filtered):filtered;
+}
+
+function qualifiedTableHtml(rows){
+  const showFloor=shouldShowFloor(),cols=showFloor?19:18;
+  let h=`<thead><tr><th class="keep-head">Garder</th>${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${showFloor?qualHeader('floor','Étage'):''}${qualHeader('copro','Copro')}${qualHeader('terrain','Terrain','num')}<th>Équipements / extérieurs</th>${qualHeader('works','Travaux / source')}${qualHeader('workBudget','Budget travaux préconisés (audit)','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('ppm','€/m²','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;
+  rows.forEach(r=>{
+    const di=r.dpeInfo,b=simpleWorkBudget(r),keep=priceRowIsKept(r);
+    h+=`<tr class="${keep?'price-kept':'price-excluded'}"><td class="keep-head"><input class="price-keep" type="checkbox" ${keep?'checked':''} onchange="togglePriceKeep('${encodeURIComponent(rowKey(r))}')" title="Inclure ce bien dans le Prix global médian"></td><td>${r.date||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td>${showFloor?`<td>${floorLabel(di?.floor)}</td>`:''}<td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td>${freeFeaturesHtml(r)}</td><td>${simpleWorksCellHtml(r)}</td><td class="num">${isFinite(b.value)&&b.value>0?`<b>${eur(b.value)}</b><span class="conf">${b.source==='audit'?'travaux énergétiques préconisés · audit certain':'saisie manuelle'}</span>`:(b.source==='audit_unconfirmed'?`<span class="conf low"><b>À confirmer</b><br>audit non suffisamment rapproché</span>`:'—')}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;
+  });
+  if(!rows.length)h+=`<tr><td colspan="${cols}" style="padding:28px;text-align:center"><b>Aucune vente ne correspond aux filtres actuels.</b><br><span class="conf" style="display:block;margin-top:6px">Clique « Réinitialiser » pour afficher toutes les ventes de l’analyse.</span></td></tr>`;
+  return h+'</tbody>';
+}
+
+function multiChoiceHtml(name,values,current){
+  const cur=Array.isArray(current)?current:[];
+  return `<div class="multi-choice">${values.map(([v,l])=>`<label><input type="checkbox" name="${name}" value="${v}" ${cur.includes(v)?'checked':''} onchange="refreshQualifiedView()"><span>${l}</span></label>`).join('')}</div>`;
 }
 function filterBarHtml(){
   const f=normalizeManualFilterState(state.qual.filters||{}),showFloor=shouldShowFloor();
