@@ -334,9 +334,9 @@ input[type=range]::-moz-range-thumb {
 
 /* ── Content ── */
 .content { flex: 1; overflow-y: auto; position: relative; background: var(--bg); }
-#mapView { position: absolute; inset: 0; display: none; overflow: hidden; }
+#mapView { position: absolute; inset: 0; display: none; }
 #map { width: 100%; height: 100%; }
-.dashboard { padding: 20px 24px; display: none; }
+.dashboard { padding: 28px 32px; display: none; }
 .dashboard.active { display: block; }
 #mapView.active { display: block; }
 
@@ -1029,15 +1029,7 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
 .keep-all-wrap { display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; }
 .keep-all-wrap input { width: 16px; height: 16px; accent-color: var(--olive); cursor: pointer; }
 .keep-all-wrap span { font-size: 9px; font-weight: 700; letter-spacing: .02em; color: var(--muted); }
-.keep-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.keep-actions button { 
-  padding: 5px 12px; border-radius: 6px; 
-  border: 1.5px solid rgba(255,255,255,.25); 
-  background: rgba(255,255,255,.12); 
-  color: #fff; font-size: 11.5px; font-weight: 700; 
-  cursor: pointer; transition: all .12s;
-}
-.keep-actions button:hover { background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.4); }
+.keep-actions button { min-width: 120px; }
 
 /* ── Misc ── */
 .dpebadge { padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 700; font-size: 11px; display: inline-block; }
@@ -1134,7 +1126,7 @@ thead th { background: var(--surface-2) !important; color: var(--text-2) !import
 .keep-all-wrap{display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
 .keep-all-wrap input{width:17px;height:17px;accent-color:#caa738;cursor:pointer}
 .keep-all-wrap span{font-size:9px;font-weight:900;letter-spacing:.02em}
-.keep-actions{display:flex;gap:8px;flex-wrap:wrap}.keep-actions button{padding:5px 12px;border-radius:6px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#fff;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .12s}.keep-actions button:hover{background:rgba(255,255,255,.22)}
+.keep-actions button{min-width:126px}
 </style>
 
 
@@ -1850,7 +1842,7 @@ function renderVendus(){
     <div class="darkbar" onclick="toggleCollapse('mutList',this)"><span class="caret">▶</span> <span id="mutLabel">Liste des mutations (${S.length} sélectionnées / ${state.filtered.length} total)</span></div>
     <div class="collapse closed" id="mutList">
       <div class="tbl-head" style="margin-top:10px;display:flex;align-items:center;gap:10px">
-        <button id="selBtn" onclick="toggleAll()" style="padding:4px 12px;border-radius:6px;border:1.5px solid #E5E4DF;background:#fff;color:#3A3A36;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .12s">${S.length===state.filtered.length?'✕ Tout désélectionner':'✓ Tout garder'} <span style="color:#6B6A65;font-weight:500">(${S.length}/${state.filtered.length})</span></button>
+        <button id="selBtn" onclick="toggleAll()" style="padding:4px 12px;border-radius:6px;border:1.5px solid #E5E4DF;background:#fff;color:#3A3A36;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .12s">${S.length===state.filtered.length?'✕ Tout désélectionner':'✓ Tout sélectionner'} <span style="color:#6B6A65;font-weight:500">(${S.length}/${state.filtered.length})</span></button>
       </div>
       <div class="tbl-scroll"><table id="mutTable">${mutTableHtml()}</table></div>
     </div>
@@ -2530,13 +2522,202 @@ function qualifiedSummaryHtml(){const S=state.qual.rows.filter(r=>r.selected&&r.
 function dpeMarketHtml(){const rows=state.qual.rows.filter(r=>r.selected&&r.dpeInfo?.dpe&&isFinite(r.ppm)),by={};rows.forEach(r=>(by[r.dpeInfo.dpe]=by[r.dpeInfo.dpe]||[]).push(r.ppm));const target=resolveTarget(state.qual.target||{}).dpe,base=target&&by[target]?.length>=2?median(by[target]):NaN;let any=false,h='';DPE_ORDER.forEach(d=>{const a=by[d]||[];if(a.length<2){h+=`<div class="dpe-market-card">${dpeBadge(d)}<div class="mppm">—</div><div class="mn">${a.length} réf.</div></div>`;return;}any=true;const m=median(a),delta=isFinite(base)?(m/base-1)*100:NaN;h+=`<div class="dpe-market-card">${dpeBadge(d)}<div class="mppm">${ppmF(m)}</div><div class="mn">${a.length} références</div><div class="mdelta">${isFinite(delta)?((delta>=0?'+':'')+delta.toFixed(1)+'% vs '+target):'médiane locale'}</div></div>`;});return`<div class="qual-panel"><h3>Effet DPE observé dans les références enrichies</h3><div class="subtxt">Médianes locales uniquement lorsque la classe contient au moins 2 références. À interpréter avec prudence : ce n’est pas un coefficient national.</div>${any?`<div class="dpe-market">${h}</div>`:'<div class="placeholder">Pas encore assez de DPE rapprochés pour comparer les classes.</div>'}</div>`;}
 function buildingCell(r){const p=r.publicInfo,b=p?.bdnb;if(!p?.done)return'<span class="conf">non enrichi</span>';if(!b)return'<span class="conf">non trouvé</span>';const bits=[];if(isFinite(b.levels))bits.push(f0(b.levels)+' niv.');if(isFinite(b.nbLog))bits.push(f0(b.nbLog)+' log.');if(isFinite(b.year))bits.push('≈ '+f0(b.year));const warn=b.ambiguous?`<span class="conf low">⚠ ${b.alternatives} bâtiments possibles — seules les données communes sont affichées</span>`:'';return`${bits.join(' · ')||(b.ambiguous?'BDNB ambigu':'BDNB trouvé')}<span class="conf">${esc(b.id||'')}</span>${warn}`;}
 function coproCell(r){const p=r.publicInfo,c=publicCoproStatus(r);if(c.value===true){const immat=c.immat||p?.immat||'';if(p?.rnic?.procedureFields&&p.rnic.procedureAlert)return`<span class="mutationpill warn">⚠ Copro · signal RNIC</span><span class="conf">${esc(immat)}</span>`;return`<span class="mutationpill simple">✓ Copropriété confirmée</span><span class="conf">${esc(c.label)}${immat?' · '+esc(immat):''}${isFinite(p?.rnic?.lots)?' · '+f0(p.rnic.lots)+' lots':''}</span>`;}if(c.value===false&&r.type==='Maison')return`<span class="mutationpill simple">○ Non détectée</span><span class="conf">${esc(c.label)} · résultat figé jusqu’à actualisation</span>`;if(!p?.done)return'<span class="conf">vérification en cours / source indisponible</span>';return`<span class="conf">${esc(c.label||'Inconnu')}</span>`;}
-function qualifiedTableHtml(rows){const t=state.qual.target||{};let h=`<thead><tr><th>Retenir</th>${qualHeader('score','Score')}${qualHeader('quality','Qualité')}${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('surfaceGap','Écart surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${qualHeader('floor','Étage')}${qualHeader('copro','Copropriété')}${qualHeader('terrain','Terrain','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;rows.forEach(r=>{const q=qualityInfo(r.qScore),di=r.dpeInfo,wb=comparableWorkBudget(r),c=totalCorrectionPerM2(r),cp=correctedPpm(r);h+=`<tr class="${r.qSelected?'qkept':''}"><td><input class="starck" type="checkbox" ${r.qSelected?'checked':''} onchange="toggleQualified('${encodeURIComponent(rowKey(r))}')"></td><td><span class="scorepill">${r.qScore}</span><span class="conf">couverture ${r.qCoverage}%</span></td><td><span class="qualitypill ${q[1]}">${q[0]}</span></td><td>${r.date||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${gapHtml(r,t)}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td><td>${floorLabel(di?.floor)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td></td><td></td><td class="num">${wb.value>0?`<b>${eur(wb.value)}</b><span class="conf">${wb.source==='audit'?'AUDIT ADEME':'saisie manuelle'}</span>`:'—'}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num">${ppmF(r.ppm)}</td><td>${correctionBreakdownHtml(r)}</td><td class="num">${isFinite(cp)?`<span class="corrected-price">${ppmF(cp)}</span>`:'—'}</td><td class="num">${medianGapHtml(r)}</td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;});return h+'</tbody>';}
+function qualifiedTableHtml(rows){const t=state.qual.target||{};let h=`<thead><tr><th>Retenir</th>${qualHeader('score','Score')}${qualHeader('quality','Qualité')}${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('surfaceGap','Écart surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${qualHeader('floor','Étage')}${qualHeader('copro','Copropriété')}${qualHeader('terrain','Terrain','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;rows.forEach(r=>{const q=qualityInfo(r.qScore),di=r.dpeInfo,wb=comparableWorkBudget(r),c=totalCorrectionPerM2(r),cp=correctedPpm(r);h+=`<tr class="${r.qSelected?'qkept':''}"><td><input class="starck" type="checkbox" ${r.qSelected?'checked':''} onchange="toggleQualified('${encodeURIComponent(rowKey(r))}')"></td><td><span class="scorepill">${r.qScore}</span><span class="conf">couverture ${r.qCoverage}%</span></td><td><span class="qualitypill ${q[1]}">${q[0]}</span></td><td>${r.date||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${gapHtml(r,t)}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td><td>${floorLabel(di?.floor)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td class="num">${wb.value>0?`<b>${eur(wb.value)}</b><span class="conf">${wb.source==='audit'?'AUDIT ADEME':'saisie manuelle'}</span>`:'—'}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num">${ppmF(r.ppm)}</td><td>${correctionBreakdownHtml(r)}</td><td class="num">${isFinite(cp)?`<span class="corrected-price">${ppmF(cp)}</span>`:'—'}</td><td class="num">${medianGapHtml(r)}</td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;});return h+'</tbody>';}
 function filterBarHtml(){const f=state.qual.filters||{},o=(v,k)=>String(f[k]||'all')===String(v)?' selected':'';return`<div class="qual-filterbar"><div class="qf"><label>DPE</label><select id="qfDpe" onchange="refreshQualifiedView()"><option value="all"${o('all','dpe')}>Tous</option><option value="same"${o('same','dpe')}>Identique</option><option value="one"${o('one','dpe')}>± 1 classe</option></select></div><div class="qf"><label>Surface</label><select id="qfSurface" onchange="refreshQualifiedView()"><option value="all"${o('all','surface')}>Toutes</option><option value="5"${o('5','surface')}>± 5 %</option><option value="10"${o('10','surface')}>± 10 %</option><option value="15"${o('15','surface')}>± 15 %</option><option value="20"${o('20','surface')}>± 20 %</option></select></div><div class="qf"><label>Pièces</label><select id="qfPieces" onchange="refreshQualifiedView()"><option value="all"${o('all','pieces')}>Toutes</option><option value="same"${o('same','pieces')}>Identique</option><option value="one"${o('one','pieces')}>± 1 pièce</option></select></div><div class="qf"><label>Construction</label><select id="qfPeriod" onchange="refreshQualifiedView()"><option value="all"${o('all','period')}>Toutes</option><option value="same"${o('same','period')}>Même période</option></select></div><div class="qf"><label>Étage</label><select id="qfFloor" onchange="refreshQualifiedView()"><option value="all"${o('all','floor')}>Tous</option><option value="same"${o('same','floor')}>Identique</option><option value="one"${o('one','floor')}>± 1 étage</option></select></div><div class="qf"><label>Traversant</label><select id="qfTraversant" onchange="refreshQualifiedView()"><option value="all"${o('all','traversant')}>Tous</option><option value="same"${o('same','traversant')}>Identique</option></select></div><div class="qf"><label>Distance</label><select id="qfDistance" onchange="refreshQualifiedView()"><option value="all"${o('all','distance')}>Toutes</option><option value="250"${o('250','distance')}>≤ 250 m</option><option value="500"${o('500','distance')}>≤ 500 m</option><option value="1000"${o('1000','distance')}>≤ 1 km</option></select></div><div class="qf"><label>Récence</label><select id="qfRecency" onchange="refreshQualifiedView()"><option value="all"${o('all','recency')}>Toutes</option><option value="12"${o('12','recency')}>≤ 12 mois</option><option value="24"${o('24','recency')}>≤ 24 mois</option><option value="36"${o('36','recency')}>≤ 36 mois</option></select></div><div class="qf"><label>Mutation</label><select id="qfMutation" onchange="refreshQualifiedView()"><option value="all"${o('all','mutation')}>Toutes</option><option value="simple"${o('simple','mutation')}>Ventes simples uniquement</option></select></div><div class="qf"><label>Copro maison</label><select id="qfCopro" onchange="refreshQualifiedView()"><option value="all"${o('all','copro')}>Toutes</option><option value="yes"${o('yes','copro')}>En copropriété</option><option value="no"${o('no','copro')}>Non détectée</option></select></div><div class="qf"><label>État intérieur</label><select id="qfInterior" onchange="refreshQualifiedView()"><option value="all"${o('all','interior')}>Tous</option>${INTERIOR_STATES.filter(x=>x[0]!=='UNKNOWN').map(([v,l])=>`<option value="${v}"${o(v,'interior')}>${l}</option>`).join('')}</select></div><div class="qf"><label>Travaux</label><select id="qfWorks" onchange="refreshQualifiedView()"><option value="all"${o('all','works')}>Tous</option><option value="known"${o('known','works')}>Info travaux connue</option><option value="audit"${o('audit','works')}>Audit ADEME</option><option value="manual"${o('manual','works')}>Saisie manuelle</option></select></div><button class="qual-secondary" onclick="resetQualifiedFilters()">Réinitialiser</button></div>`;}
 function targetMatchNote(){const t=state.qual.target||{},m=state.qual.targetMatch,resolved=resolveTarget(t);if(!m&&t.dpe==='AUTO')return`Aucun DPE suffisamment fiable n’a été rapproché automatiquement du bien cible. Les critères publics inconnus ne pénalisent pas le score.`;let txt=`DPE : ${dpeBadge(resolved.dpe)} · Construction : <b>${periodLabel(resolved.period)}</b>`;if(isFinite(resolved.floor))txt+=` · Étage : <b>${floorLabel(resolved.floor)}</b>`;if(resolved.traversant!==null)txt+=` · Traversant : <b>${boolLabel(resolved.traversant)}</b>`;if(resolved.orientation)txt+=` · Orientation : <b>${resolved.orientation}</b>`;if(t.type==='Maison'&&resolved.copro!==null){const auto=t.copro==='AUTO',lab=resolved.copro?'Oui':'Non détectée';txt+=` · Copropriété : <b>${lab}${auto?' (auto)':''}</b>`;}if(m?.date)txt+=` · DPE du ${esc(m.date)}`;return txt+'.';}
 function renderQualifiedResults(){const body=document.getElementById('qualBody');if(!body||!state.qual.rows.length){renderQualifiedBase();return;}const source=qualifiedSourceRows(),baseRows=qualifiedFilteredRows(false),rows=qualifiedSortRows(baseRows),top=[...baseRows].sort((a,b)=>b.qScore-a.qScore||(a.dist-b.dist)).slice(0,5);const remainingDpe=state.qual.enrichedAll?'':`<button class="qual-secondary" onclick="runQualifiedRanking(true)">Enrichir tous les DPE (${source.length})</button>`,remainingPublic=state.qual.publicEnrichedAll?'':`<button class="qual-secondary" onclick="enrichQualifiedPublic(true)">Enrichir toutes les données publiques (${source.length})</button>`,remainingAudit=state.qual.auditEnrichedAll?'':`<button class="qual-secondary" onclick="enrichQualifiedWorks(true)">Enrichir tous les AUDITS travaux (${source.length})</button>`;body.innerHTML=`<div class="qual-hero"><div><h2>Détermination du prix</h2><p>Étape 1 ter : le prix DVF reste intact, puis une seconde lecture calcule un €/m² corrigé selon l’état intérieur (%) et/ou le budget travaux.</p></div><div class="qual-source">${Math.min(state.qual.enrichedCount,source.length)}/${source.length} DPE · ${source.filter(r=>r.publicInfo?.done).length}/${source.length} public · ${source.filter(r=>r.auditChecked).length}/${source.length} audit</div></div>
   <div class="qual-panel"><h3>Bien à estimer</h3><div class="subtxt">${esc(state.addresses[0]?.label||'')}</div><div class="target-dpe-note">${targetMatchNote()}</div>${targetPublicSummaryHtml()}${targetWorksSummaryHtml()}<div class="qual-actions"><button class="qual-secondary" onclick="editQualifiedTarget()">Modifier les caractéristiques / travaux</button><button class="qual-secondary" onclick="openTargetPublicModal()">Voir les données publiques cible</button>${remainingDpe}${remainingPublic}${remainingAudit}</div></div>
   ${qualifiedSummaryHtml()}
-  <div class="qual-panel"><h3>Top 5 des comparables</h3><div class="subtxt">L’état et son coefficient restent modifiables via « ✎ État / travaux », sans encombrer le tableau. La colonne Travaux conserve le budget éventuel et la correction appliquée.</div><div class="qual-top">${top.length?top.map(qualCardHtml).join(''):'<div class="placeholder">Aucun comparable avec les filtres actuels.</div>'}</div>${filterBarHtml()}<div class="qual-table-wrap"><table class="qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div></div>`;
+  <div class="qual-panel"><h3>Top 5 des comparables</h3><div class="subtxt">L’état et son coefficient restent modifiables via « ✎ État / travaux », sans encombrer le tableau. La colonne Travaux conserve le budget éventuel et la correction appliquée.</div><div class="qual-top">${top.length?top.map(qualCardHtml).join(''):'<div class="placeholder">Aucun comparable avec les filtres actuels.</div>'}</div>${filterBarHtml()}<div class="qual-table-wrap"><table class="qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div><div class="qual-warn">Correction prix : le coefficient d’état est calculé par différence entre l’état cible et l’état du comparable. Barème par défaut : neuf +12 %, très bon +7 %, bon 0 %, à rafraîchir −5 %, à rénover −12 %. Tous ces pourcentages sont modifiables. Le mode « État + budget » cumule volontairement les deux corrections : utilise-le seulement si tu veux éviter qu’elles décrivent deux fois les mêmes travaux. La valeur DVF d’origine reste toujours intacte.</div></div>${dpeMarketHtml()}`;}
+function refreshQualifiedView(){state.qual.filters={dpe:document.getElementById('qfDpe')?.value||'all',surface:document.getElementById('qfSurface')?.value||'all',pieces:document.getElementById('qfPieces')?.value||'all',period:document.getElementById('qfPeriod')?.value||'all',distance:document.getElementById('qfDistance')?.value||'all',recency:document.getElementById('qfRecency')?.value||'all',mutation:document.getElementById('qfMutation')?.value||'all',floor:document.getElementById('qfFloor')?.value||'all',traversant:document.getElementById('qfTraversant')?.value||'all',copro:document.getElementById('qfCopro')?.value||'all',interior:document.getElementById('qfInterior')?.value||'all',works:document.getElementById('qfWorks')?.value||'all'};const baseRows=qualifiedFilteredRows(false),rows=qualifiedSortRows(baseRows),tbl=document.getElementById('qualTable');if(tbl)tbl.innerHTML=qualifiedTableHtml(rows);const top=document.querySelector('.qual-top');if(top){const topRows=[...baseRows].sort((a,b)=>b.qScore-a.qScore||(a.dist-b.dist)).slice(0,5);top.innerHTML=topRows.map(qualCardHtml).join('')||'<div class="placeholder">Aucun comparable avec les filtres actuels.</div>';}}
+function resetQualifiedFilters(){state.qual.filters={dpe:'all',surface:'all',pieces:'all',period:'all',distance:'all',recency:'all',mutation:'all',floor:'all',traversant:'all',copro:'all',interior:'all',works:'all'};['qfDpe','qfSurface','qfPieces','qfPeriod','qfDistance','qfRecency','qfMutation','qfFloor','qfTraversant','qfCopro','qfInterior','qfWorks'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='all';});refreshQualifiedView();}
+function toggleQualified(encoded){const k=decodeURIComponent(encoded),r=state.qual.rows.find(x=>rowKey(x)===k);if(!r)return;r.qSelected=!r.qSelected;renderQualifiedResults();}
+function editQualifiedTarget(){state.qual.rows=[];state.qual.targetPublic=null;state.qual.targetAudit=null;renderQualifiedBase();}
+
+
+
+
+/* =========================================================
+   DÉTERMINATION DU PRIX — MODE TABLEAU SIMPLE
+   Toutes les ventes conservées dans l'analyse sont affichées. Aucun score,
+   aucun Top 5 et aucun prix cible automatique : l'utilisateur
+   arbitre directement avec les filtres et les tris.
+   ========================================================= */
+function qualifiedSourceRows(){return sel();}
+
+function simpleEquipmentMatch(r,kind){
+  const o=r?.publicInfo?.osm||{},a=annexeInfoForRow(r);
+  if(kind==='any')return !!(o.elevator||o.parking||o.garage||o.balcony||o.terrace||o.garden||a?.dependences);
+  if(kind==='dependence')return !!a?.dependences;
+  return !!o?.[kind];
+}
+function simpleWorkBudget(r){
+  const m=manualWorkBudget(r);if(isFinite(m))return{value:m,source:'manual',confirmed:true};
+  const a=r?.auditInfo;
+  // Un montant AUDIT n'est affiché comme exploitable que si le rapprochement
+  // adresse + surface + temporalité est classé "high".
+  if(a&&isFinite(a.costMid)&&a.costMid>0){
+    if(a.confidence==='high')return{value:a.costMid,source:'audit',confirmed:true};
+    return{value:NaN,source:'audit_unconfirmed',confirmed:false,rawValue:a.costMid};
+  }
+  return{value:NaN,source:a?'audit_no_cost':'none',confirmed:false};
+}
+function simpleWorksCellHtml(r){
+  const a=r?.auditInfo,b=simpleWorkBudget(r),e=energyWorksInfo(r),chips=[];
+  if(a){
+    const certain=a.confidence==='high';
+    chips.push(`<span class="work-pill ${certain?'audit':'unknown'}">${certain?'Audit ADEME rapproché':'Audit ADEME possible'}</span>`);
+    if(a?.works?.length&&certain)chips.push(`<span class="work-pill audit">${esc(a.works[0])}</span>`);
+    if(b.source==='audit'&&isFinite(b.value)&&b.value>0)chips.push(`<span class="work-pill audit">Travaux préconisés · ${eur(b.value)}</span>`);
+    else if(b.source==='audit_unconfirmed')chips.push(`<span class="work-pill unknown">Budget à confirmer</span>`);
+  }else{
+    chips.push(`<span class="work-pill ${e.cls}">${esc(e.label)}</span>`);
+  }
+  return `<div class="work-stack"><div class="work-line">${chips.join('')}</div>${a?.date?`<span class="work-sub">Audit du ${esc(a.date)} · ${confidenceLabel(a.confidence)}${a.confidence!=='high'?' · montant non retenu':''}</span>`:''}<button class="work-edit" onclick="openWorkModal('${encodeURIComponent(rowKey(r))}')">✎ Détails travaux</button></div>`;
+}
+
+async function enrichAllAuditsSimple(rows,progress){
+  const todo=rows.filter(r=>!r.auditChecked);let done=0,errors=0,cursor=0;
+  async function worker(){while(cursor<todo.length){const r=todo[cursor++];try{r.auditInfo=await lookupAuditForRow(r);r.auditChecked=true;saveStableRow(r);}catch(e){errors++;r.auditInfo=null;r.auditChecked=false;}done++;progress?.(done,todo.length,errors);await sleep(150);}}
+  await Promise.all(Array.from({length:Math.min(3,todo.length)},worker));return{count:todo.length,errors};
+}
+
+function simpleEnrichmentCounts(){
+  const rows=state.qual.rows||[];return{
+    total:rows.length,
+    dpe:rows.filter(r=>r.dpeChecked).length,
+    public:rows.filter(r=>r.publicInfo?.done).length,
+    audit:rows.filter(r=>r.auditChecked).length
+  };
+}
+
+async function enrichSimpleDetermination(force=false){
+  if(state.qual.running||!state.qual.rows.length)return;
+  state.qual.simpleStarted=true;state.qual.running=true;
+  try{
+    const rows=state.qual.rows;
+    if(force){
+      clearRuntimeEnrichmentCaches();
+      rows.forEach(r=>{const locked=loadCoproDecision(r,r.publicInfo?.banId||r.dpeInfo?.banId||'');clearStableRow(r);r.dpeChecked=false;delete r.dpeInfo;r.publicInfo=locked?{done:false,osmChecked:false,coproDecision:locked,immat:locked.immat||'',immatSource:locked.source||'',errors:[]}:null;r.auditChecked=false;r.auditInfo=null;});
+    }
+    setStatus(`Tableau affiché · enrichissement DPE en arrière-plan (${rows.length} ventes)…`,'info');
+    const er=await enrichRowsDpe(rows,(d,n,e)=>{const info=document.getElementById('srcInfo');if(info)info.textContent=`DPE ADEME ${d}/${n}${e?' · '+e+' erreur(s)':''}…`;});
+    state.qual.dpeErrors=er.errors;state.qual.enrichedCount=rows.filter(r=>r.dpeInfo!=null).length;state.qual.enrichedAll=true;
+    renderQualifiedResults();
+    setStatus(`DPE chargé · enrichissement copropriété / équipements / travaux en parallèle…`,'info');
+    const [pe,ae]=await Promise.all([
+      enrichRowsPublic(rows,(d,n)=>{const info=document.getElementById('srcInfo');if(info)info.textContent=`BDNB / RNIC / OSM ${d}/${n}…`;}),
+      enrichAllAuditsSimple(rows,(d,n)=>{const el=document.getElementById('simpleProgress');if(el)el.textContent=`AUDIT ADEME ${d}/${n}…`;})
+    ]);
+    state.qual.publicErrors+=pe.errors;state.qual.auditErrors+=ae.errors;
+    state.qual.publicEnrichedCount=rows.filter(r=>r.publicInfo?.done).length;state.qual.publicEnrichedAll=state.qual.publicEnrichedCount>=rows.length;
+    state.qual.auditEnrichedCount=rows.filter(r=>r.auditChecked).length;state.qual.auditEnrichedAll=state.qual.auditEnrichedCount>=rows.length;
+    renderQualifiedResults();
+    const c=simpleEnrichmentCounts();
+    setStatus(`Tableau enrichi : ${c.total} ventes · ${c.dpe} DPE · ${c.public} données bâtiment/copro/OSM · ${c.audit} audits vérifiés.`,'ok');
+  }catch(e){console.error(e);setStatus('Enrichissement du tableau : '+e.message,'err');}
+  finally{state.qual.running=false;}
+}
+
+function renderQualifiedBase(){
+  const body=document.getElementById('qualBody');if(!body)return;
+  const source=qualifiedSourceRows();
+  if(!source.length){body.innerHTML='<div class="qual-empty">Lance d’abord une analyse DVF. Toutes les ventes issues de cette analyse apparaîtront ensuite ici.</div>';return;}
+  state.qual.rows=[...source];
+  const profiles=buildMutationProfiles();let restored=0;
+  state.qual.rows.forEach(r=>{if(loadStableRow(r))restored++;r.qMutationProfile=r.id?profiles.get(r.id):null;r.qMutation=classifyMutation(r,profiles);r.qMicro=microLocationInfo(r);});
+  state.qual.snapshotRestored=restored;
+  if(!state.qual.sort||['score','quality','surfaceGap','correctedPpm','stateCoef','medianGap'].includes(state.qual.sort.key))state.qual.sort={key:'date',dir:-1};
+  renderQualifiedResults();
+}
+
+function qualifiedSortValue(r,key){
+  if(key==='date')return r.date?Date.parse(r.date):NaN;if(key==='distance')return r.dist;if(key==='type')return r.type||'';if(key==='surface')return r.surface;if(key==='pieces')return r.pieces;
+  if(key==='dpe')return r.dpeInfo?.dpe?DPE_ORDER.indexOf(r.dpeInfo.dpe):NaN;if(key==='construction')return r.dpeInfo?.period?periodIndex[r.dpeInfo.period]:NaN;if(key==='floor')return r.dpeInfo?.floor;
+  if(key==='traversant')return r.dpeInfo?.traversant===true?1:r.dpeInfo?.traversant===false?0:NaN;if(key==='orientation'){const o=mainOrientationForScore(r.dpeInfo);return o?ORIENTATIONS.indexOf(o):NaN;}
+  if(key==='copro'){const c=publicCoproStatus(r);return c.value===true?0:c.value===false?1:2;}if(key==='terrain')return r.terrain;if(key==='works')return worksSourceType(r);if(key==='workBudget')return simpleWorkBudget(r).value;
+  if(key==='val')return r.val;if(key==='ppm')return r.ppm;if(key==='mutation')return r.qMutation?.simple?0:(r.qMutation?.status==='unknown'?1:2);if(key==='voie')return r.voie||'';return NaN;
+}
+function qualifiedSortRows(rows){const srt=state.qual.sort||{key:'date',dir:-1};return[...rows].sort((a,b)=>{const va=qualifiedSortValue(a,srt.key),vb=qualifiedSortValue(b,srt.key),ma=va==null||(typeof va==='number'&&!isFinite(va))||va==='',mb=vb==null||(typeof vb==='number'&&!isFinite(vb))||vb==='';if(ma!==mb)return ma?1:-1;let cmp=0;if(!(ma&&mb))cmp=(typeof va==='string'||typeof vb==='string')?String(va).localeCompare(String(vb),'fr',{numeric:true,sensitivity:'base'}):va-vb;if(cmp)return cmp*srt.dir;const dc=(Date.parse(b.date||0)||0)-(Date.parse(a.date||0)||0);if(dc)return dc;return stableRowId(a).localeCompare(stableRowId(b),'fr',{numeric:true,sensitivity:'base'});});}
+function sortQualifiedBy(key){const srt=state.qual.sort||{key:'date',dir:-1};if(srt.key===key)srt.dir*=-1;else{srt.key=key;srt.dir=['date','val','ppm','workBudget'].includes(key)?-1:1;}state.qual.sort=srt;refreshQualifiedView();}
+
+function simpleSurfaceOk(v,f){if(f==='all')return true;if(!isFinite(v))return false;if(f==='lt50')return v<50;if(f==='50_75')return v>=50&&v<75;if(f==='75_100')return v>=75&&v<100;if(f==='100_125')return v>=100&&v<125;if(f==='125_150')return v>=125&&v<150;if(f==='gte150')return v>=150;return true;}
+function simplePiecesOk(v,f){if(f==='all')return true;if(!isFinite(v))return false;if(f==='6plus')return v>=6;return v===+f;}
+function simpleFloorOk(v,f){if(f==='all')return true;if(f==='unknown')return !isFinite(v);if(!isFinite(v))return false;if(f==='rdc')return +v===0;if(f==='1')return +v===1;if(f==='2plus')return +v>=2;return true;}
+function qualifiedFilteredRows(applySort=true){
+  const rows=state.qual.rows||[],f=state.qual.filters||{};
+  const g=(id,k)=>document.getElementById(id)?.value||f[k]||'all';
+  const ft=g('qfType','type'),fd=g('qfDpe','dpe'),fs=g('qfSurface','surface'),fp=g('qfPieces','pieces'),fy=g('qfPeriod','period'),ff=g('qfFloor','floor'),fc=g('qfCopro','copro'),fter=g('qfTerrain','terrain'),fe=g('qfEquipment','equipment'),fw=g('qfWorks','works'),fdist=g('qfDistance','distance'),fr=g('qfRecency','recency'),fm=g('qfMutation','mutation');
+  const ppmMin=+(document.getElementById('qfPpmMin')?.value||f.ppmMin||0),ppmMax=+(document.getElementById('qfPpmMax')?.value||f.ppmMax||0);
+  const filtered=rows.filter(r=>{
+    if(ft!=='all'&&r.type!==ft)return false;
+    if(fd!=='all'){if(fd==='none'){if(r.dpeInfo?.dpe)return false;}else if(r.dpeInfo?.dpe!==fd)return false;}
+    if(!simpleSurfaceOk(r.surface,fs)||!simplePiecesOk(r.pieces,fp))return false;
+    if(fy!=='all'&&r.dpeInfo?.period!==fy)return false;
+    if(!simpleFloorOk(r.dpeInfo?.floor,ff))return false;
+    if(fc!=='all'){const c=publicCoproStatus(r);if(fc==='yes'&&c.value!==true)return false;if(fc==='no'&&c.value!==false)return false;if(fc==='unknown'&&c.value!==null)return false;}
+    if(fter==='yes'&&!(r.terrain>0))return false;if(fter==='no'&&r.terrain>0)return false;
+    if(fe!=='all'&&!simpleEquipmentMatch(r,fe))return false;
+    if(fw!=='all'){const src=worksSourceType(r);if(fw==='audit'&&src!=='audit')return false;if(fw==='manual'&&src!=='manual')return false;if(fw==='known'&&src==='none')return false;if(fw==='none'&&src!=='none')return false;}
+    if(fdist!=='all'&&(!isFinite(r.dist)||r.dist>+fdist))return false;
+    if(fr!=='all'){const m=monthsAgo(r.date);if(!isFinite(m)||m>+fr)return false;}
+    if(fm==='simple'&&!r.qMutation?.simple)return false;
+    if(ppmMin&&(!isFinite(r.ppm)||r.ppm<ppmMin))return false;if(ppmMax&&(!isFinite(r.ppm)||r.ppm>ppmMax))return false;
+    return true;
+  });return applySort?qualifiedSortRows(filtered):filtered;
+}
+
+function qualifiedTableHtml(rows){
+  let h=`<thead><tr>${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${qualHeader('floor','Étage')}${qualHeader('copro','Copropriété')}${qualHeader('terrain','Terrain','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;
+  rows.forEach(r=>{const di=r.dpeInfo,b=simpleWorkBudget(r);h+=`<tr><td>${r.date||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td><td>${floorLabel(di?.floor)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td>${simpleWorksCellHtml(r)}</td><td class="num">${isFinite(b.value)&&b.value>0?`<b>${eur(b.value)}</b><span class="conf">${b.source==='audit'?'travaux énergétiques préconisés · audit certain':'saisie manuelle'}</span>`:(b.source==='audit_unconfirmed'?`<span class="conf low"><b>À confirmer</b><br>audit non suffisamment rapproché</span>`:'—')}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;});
+  if(!rows.length)h+=`<tr><td colspan="18" style="padding:28px;text-align:center"><b>Aucune vente ne correspond aux filtres actuels.</b><br><span class="conf" style="display:block;margin-top:6px">Clique « Réinitialiser » pour afficher toutes les ventes de l’analyse.</span></td></tr>`;
+  return h+'</tbody>';
+}
+
+function filterBarHtml(){
+  const f=state.qual.filters||{},o=(v,k)=>String(f[k]||'all')===String(v)?' selected':'';
+  return `<div class="qual-filterbar simple-filters">
+    <div class="qf"><label>Type</label><select id="qfType" onchange="refreshQualifiedView()"><option value="all"${o('all','type')}>Tous</option><option value="Maison"${o('Maison','type')}>Maison</option><option value="Appartement"${o('Appartement','type')}>Appartement</option><option value="Local"${o('Local','type')}>Local</option><option value="Dépendance"${o('Dépendance','type')}>Dépendance</option></select></div>
+    <div class="qf"><label>DPE</label><select id="qfDpe" onchange="refreshQualifiedView()"><option value="all"${o('all','dpe')}>Tous</option>${DPE_ORDER.map(x=>`<option value="${x}"${o(x,'dpe')}>${x}</option>`).join('')}<option value="none"${o('none','dpe')}>Non trouvé</option></select></div>
+    <div class="qf"><label>Surface</label><select id="qfSurface" onchange="refreshQualifiedView()"><option value="all"${o('all','surface')}>Toutes</option><option value="lt50"${o('lt50','surface')}>&lt; 50 m²</option><option value="50_75"${o('50_75','surface')}>50–74 m²</option><option value="75_100"${o('75_100','surface')}>75–99 m²</option><option value="100_125"${o('100_125','surface')}>100–124 m²</option><option value="125_150"${o('125_150','surface')}>125–149 m²</option><option value="gte150"${o('gte150','surface')}>≥ 150 m²</option></select></div>
+    <div class="qf"><label>Pièces</label><select id="qfPieces" onchange="refreshQualifiedView()"><option value="all"${o('all','pieces')}>Toutes</option>${[1,2,3,4,5].map(x=>`<option value="${x}"${o(String(x),'pieces')}>${x}</option>`).join('')}<option value="6plus"${o('6plus','pieces')}>6 et +</option></select></div>
+    <div class="qf"><label>Construction</label><select id="qfPeriod" onchange="refreshQualifiedView()"><option value="all"${o('all','period')}>Toutes</option>${PERIODS.map(([v,l])=>`<option value="${v}"${o(v,'period')}>${l}</option>`).join('')}</select></div>
+    <div class="qf"><label>Étage</label><select id="qfFloor" onchange="refreshQualifiedView()"><option value="all"${o('all','floor')}>Tous</option><option value="rdc"${o('rdc','floor')}>RDC</option><option value="1"${o('1','floor')}>1er</option><option value="2plus"${o('2plus','floor')}>2e et +</option><option value="unknown"${o('unknown','floor')}>Inconnu</option></select></div>
+    <div class="qf"><label>Copro maison</label><select id="qfCopro" onchange="refreshQualifiedView()"><option value="all"${o('all','copro')}>Toutes</option><option value="yes"${o('yes','copro')}>Oui</option><option value="no"${o('no','copro')}>Non détectée</option><option value="unknown"${o('unknown','copro')}>Inconnu</option></select></div>
+    <div class="qf"><label>Terrain</label><select id="qfTerrain" onchange="refreshQualifiedView()"><option value="all"${o('all','terrain')}>Tous</option><option value="yes"${o('yes','terrain')}>Avec terrain</option><option value="no"${o('no','terrain')}>Sans terrain</option></select></div>
+    <div class="qf"><label>Équipement</label><select id="qfEquipment" onchange="refreshQualifiedView()"><option value="all"${o('all','equipment')}>Tous</option><option value="any"${o('any','equipment')}>Au moins un signal</option><option value="garage"${o('garage','equipment')}>Garage</option><option value="parking"${o('parking','equipment')}>Parking</option><option value="garden"${o('garden','equipment')}>Jardin</option><option value="terrace"${o('terrace','equipment')}>Terrasse</option><option value="balcony"${o('balcony','equipment')}>Balcon</option><option value="elevator"${o('elevator','equipment')}>Ascenseur</option><option value="dependence"${o('dependence','equipment')}>Dépendance DVF</option></select></div>
+    <div class="qf"><label>Travaux</label><select id="qfWorks" onchange="refreshQualifiedView()"><option value="all"${o('all','works')}>Tous</option><option value="known"${o('known','works')}>Info connue</option><option value="audit"${o('audit','works')}>Audit ADEME</option><option value="manual"${o('manual','works')}>Saisie manuelle</option><option value="none"${o('none','works')}>Aucune info</option></select></div>
+    <div class="qf"><label>Distance</label><select id="qfDistance" onchange="refreshQualifiedView()"><option value="all"${o('all','distance')}>Toutes</option><option value="250"${o('250','distance')}>≤ 250 m</option><option value="500"${o('500','distance')}>≤ 500 m</option><option value="1000"${o('1000','distance')}>≤ 1 km</option><option value="2000"${o('2000','distance')}>≤ 2 km</option></select></div>
+    <div class="qf"><label>Récence</label><select id="qfRecency" onchange="refreshQualifiedView()"><option value="all"${o('all','recency')}>Toutes</option><option value="12"${o('12','recency')}>≤ 12 mois</option><option value="24"${o('24','recency')}>≤ 24 mois</option><option value="36"${o('36','recency')}>≤ 36 mois</option></select></div>
+    <div class="qf"><label>Mutation</label><select id="qfMutation" onchange="refreshQualifiedView()"><option value="all"${o('all','mutation')}>Toutes</option><option value="simple"${o('simple','mutation')}>Ventes simples</option></select></div>
+    <div class="qf qf-price"><label>€/m² min</label><input id="qfPpmMin" type="number" step="100" value="${esc(f.ppmMin||'')}" placeholder="Min" onchange="refreshQualifiedView()"></div>
+    <div class="qf qf-price"><label>€/m² max</label><input id="qfPpmMax" type="number" step="100" value="${esc(f.ppmMax||'')}" placeholder="Max" onchange="refreshQualifiedView()"></div>
+    <button class="qual-secondary" onclick="resetQualifiedFilters()">Réinitialiser</button>
+  </div>`;
+}
+
+function refreshQualifiedView(){
+  const get=id=>document.getElementById(id)?.value||'all';
+  state.qual.filters={type:get('qfType'),dpe:get('qfDpe'),surface:get('qfSurface'),pieces:get('qfPieces'),period:get('qfPeriod'),floor:get('qfFloor'),copro:get('qfCopro'),terrain:get('qfTerrain'),equipment:get('qfEquipment'),works:get('qfWorks'),distance:get('qfDistance'),recency:get('qfRecency'),mutation:get('qfMutation'),ppmMin:document.getElementById('qfPpmMin')?.value||'',ppmMax:document.getElementById('qfPpmMax')?.value||''};
+  const rows=qualifiedFilteredRows(true),tbl=document.getElementById('qualTable');if(tbl)tbl.innerHTML=qualifiedTableHtml(rows);const c=document.getElementById('qualVisibleCount');if(c)c.textContent=`${rows.length} / ${state.qual.rows.length} ventes affichées`;const gp=document.getElementById('simpleGlobalPrice');if(gp)gp.innerHTML=simpleGlobalPriceHtml(rows);
+}
+function resetQualifiedFilters(){state.qual.filters={type:'all',dpe:'all',surface:'all',pieces:'all',period:'all',floor:'all',copro:'all',terrain:'all',equipment:'all',works:'all',distance:'all',recency:'all',mutation:'all',ppmMin:'',ppmMax:''};renderQualifiedResults();}
+
+function simpleGlobalPriceStats(rows){
+  const vals=rows.map(r=>r.val).filter(v=>isFinite(v)&&v>0),ppms=rows.map(r=>r.ppm).filter(v=>isFinite(v)&&v>0);
+  return{count:rows.length,price:median(vals),ppm:median(ppms)};
+}
+function simpleGlobalPriceHtml(rows){
+  const st=simpleGlobalPriceStats(rows);
+  return `<div class="simple-global-price-card"><div><div class="sgp-label">Prix global médian</div><div class="sgp-value">${isFinite(st.price)?eur(st.price):'—'}</div></div><div class="sgp-meta"><b>${st.count}</b> vente${st.count>1?'s':''} affichée${st.count>1?'s':''}<br>€/m² médian : <b>${isFinite(st.ppm)?ppmF(st.ppm):'—'}</b><br><span>Recalculé automatiquement selon les filtres.</span></div></div>`;
+}
+
+function renderQualifiedResults(){
+  const body=document.getElementById('qualBody');if(!body)return;if(!state.qual.rows.length){renderQualifiedBase();return;}
+  const source=qualifiedSourceRows();if(source.length!==state.qual.rows.length||source.some((r,i)=>rowKey(r)!==rowKey(state.qual.rows[i]))){state.qual.simpleStarted=false;renderQualifiedBase();return;}
+  const rows=qualifiedFilteredRows(true),c=simpleEnrichmentCounts();
+  body.innerHTML=`<div class="qual-hero simple-qual-hero"><div><h2>Détermination du prix</h2><p>Toutes les ventes issues de l’analyse sont regroupées ici. Trie et filtre les caractéristiques pour retenir mentalement les références les plus pertinentes.</p></div><div class="qual-source">${c.total} VENTES · ${c.dpe} DPE · ${c.public} PUBLIC</div></div>
+  <div class="qual-panel simple-table-panel"><div class="simple-table-head"><div><h3>Tableau des ventes analysées</h3><div class="subtxt">Aucun score ni prix cible automatique : les données DVF restent brutes et les caractéristiques publiques servent uniquement à ton appréciation.</div></div><div class="simple-head-actions"><span id="qualVisibleCount" class="visible-count">${rows.length} / ${state.qual.rows.length} ventes affichées</span><span id="simpleProgress" class="qual-progress"></span><button class="qual-secondary" onclick="enrichSimpleDetermination(true)">Actualiser depuis les sources</button></div></div><div id="simpleGlobalPrice">${simpleGlobalPriceHtml(rows)}</div>${filterBarHtml()}<div class="qual-table-wrap simple-table-wrap"><table class="qual-table simple-qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div><div class="qual-warn"><b>Données stabilisées :</b> la copropriété est vérifiée séparément et verrouillée dès qu’une immatriculation fiable est confirmée. L’identité du bien est basée sur la mutation DVF + l’adresse, et toutes les parcelles de la mutation sont contrôlées : un changement de parcelle représentative après dédoublonnage ne peut plus déplacer le statut copropriété. Un « Non détectée » n’est retenu qu’après contrôle BDNB concordant par adresse et toutes les parcelles connues. Une copropriété confirmée est mémorisée durablement par mutation/adresse et un simple rafraîchissement ne peut plus la faire disparaître. Un DPE seulement probable ne suffit plus : il doit être confirmé par le RNIC. Les statuts « Non détectée » ne sont jamais verrouillés : en cas de doute ils repassent à « Inconnu ». Les autres enrichissements sont conservés localement pendant 7 jours. « Actualiser depuis les sources » recontrôle les données sans effacer les copropriétés déjà confirmées.</div></div>`;
   if(state.view==='qualifies'&&!state.qual.simpleStarted&&!state.qual.running){state.qual.simpleStarted=true;setTimeout(()=>enrichSimpleDetermination(false),40);}
 }
 
@@ -2683,7 +2864,7 @@ function qualifiedTableHtml(rows){
   let h=`<thead><tr><th class="keep-head">Garder</th>${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${showFloor?qualHeader('floor','Étage'):''}${qualHeader('copro','Copro')}${qualHeader('terrain','Terrain','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;
   rows.forEach(r=>{
     const di=r.dpeInfo,b=simpleWorkBudget(r),keep=priceRowIsKept(r);
-    h+=`<tr class="${keep?'price-kept':'price-excluded'}"><td class="keep-head"><input class="price-keep" type="checkbox" ${keep?'checked':''} onchange="togglePriceKeep('${encodeURIComponent(rowKey(r))}')" title="Inclure ce bien dans le Prix global médian"></td><td>${r.date||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td>${showFloor?`<td>${floorLabel(di?.floor)}</td>`:''}<td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td></td><td></td><td class="num">${isFinite(b.value)&&b.value>0?`<b>${eur(b.value)}</b><span class="conf">${b.source==='audit'?'travaux énergétiques préconisés · audit certain':'saisie manuelle'}</span>`:(b.source==='audit_unconfirmed'?`<span class="conf low"><b>À confirmer</b><br>audit non suffisamment rapproché</span>`:'—')}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;
+    h+=`<tr class="${keep?'price-kept':'price-excluded'}"><td class="keep-head"><input class="price-keep" type="checkbox" ${keep?'checked':''} onchange="togglePriceKeep('${encodeURIComponent(rowKey(r))}')" title="Inclure ce bien dans le Prix global médian"></td><td>${r.date||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td>${showFloor?`<td>${floorLabel(di?.floor)}</td>`:''}<td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td>${simpleWorksCellHtml(r)}</td><td class="num">${isFinite(b.value)&&b.value>0?`<b>${eur(b.value)}</b><span class="conf">${b.source==='audit'?'travaux énergétiques préconisés · audit certain':'saisie manuelle'}</span>`:(b.source==='audit_unconfirmed'?`<span class="conf low"><b>À confirmer</b><br>audit non suffisamment rapproché</span>`:'—')}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;
   });
   if(!rows.length)h+=`<tr><td colspan="${cols}" style="padding:28px;text-align:center"><b>Aucune vente ne correspond aux filtres actuels.</b><br><span class="conf" style="display:block;margin-top:6px">Clique « Réinitialiser » pour afficher toutes les ventes de l’analyse.</span></td></tr>`;
   return h+'</tbody>';
@@ -2808,7 +2989,7 @@ function renderQualifiedResults(){
   }
   const rows=qualifiedFilteredRows(true),c=simpleEnrichmentCounts();
   body.innerHTML=`<div class="qual-hero simple-qual-hero"><div><h2>Détermination du prix</h2><p>Filtre les ventes, puis coche uniquement les biens que tu veux conserver dans le calcul du prix médian.</p></div><div class="qual-source">${c.total} VENTES · ${c.dpe} DPE · ${c.public} PUBLIC</div></div>
-  <div class="qual-panel simple-table-panel"><div class="simple-table-head"><div><h3>Tableau des ventes analysées</h3><div class="subtxt"></div></div><div class="simple-head-actions"><span id="qualVisibleCount" class="visible-count">${rows.length} / ${state.qual.rows.length} ventes affichées</span><span id="simpleProgress" class="qual-progress"></span><button class="qual-secondary" onclick="enrichSimpleDetermination(true)">Actualiser depuis les sources</button></div></div><div id="simpleGlobalPrice">${simpleGlobalPriceHtml(rows)}</div>${filterBarHtml()}<div class="qual-table-wrap simple-table-wrap"><table class="qual-table simple-qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div></div>`;
+  <div class="qual-panel simple-table-panel"><div class="simple-table-head"><div><h3>Tableau des ventes analysées</h3><div class="subtxt">Le Prix global médian est calculé uniquement sur les ventes affichées que tu laisses cochées dans « Garder ».</div></div><div class="simple-head-actions"><span id="qualVisibleCount" class="visible-count">${rows.length} / ${state.qual.rows.length} ventes affichées</span><span id="simpleProgress" class="qual-progress"></span><button class="qual-secondary" onclick="enrichSimpleDetermination(true)">Actualiser depuis les sources</button></div></div><div id="simpleGlobalPrice">${simpleGlobalPriceHtml(rows)}</div>${filterBarHtml()}<div class="qual-table-wrap simple-table-wrap"><table class="qual-table simple-qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div><div class="qual-warn"><b>Données stabilisées :</b> les enrichissements DPE / BDNB / RNIC / OSM / AUDIT sont réutilisés lorsqu’ils sont déjà fiabilisés. Si tu relances une nouvelle analyse, les recherches de l’analyse précédente sont immédiatement abandonnées et la priorité passe au nouveau jeu de ventes.</div></div>`;
   if(state.view==='qualifies'&&!state.qual.simpleStarted&&!state.qual.running){state.qual.simpleStarted=true;setTimeout(()=>enrichSimpleDetermination(false),40);}
 }
 
@@ -3158,7 +3339,7 @@ renderQualifiedResults=function(){
   if(source.length!==state.qual.rows.length||source.some((r,i)=>rowKey(r)!==rowKey(state.qual.rows[i]))){state.qual.simpleStarted=false;renderQualifiedBase();return;}
   const rows=qualifiedFilteredRows(true),c=simpleEnrichmentCounts();
   body.innerHTML=`<div class="qual-hero simple-qual-hero"><div><h2>Détermination du prix</h2><p>Filtre les ventes, puis coche uniquement les biens que tu veux conserver dans le calcul du prix médian.</p></div><div class="qual-source">${c.total} VENTES · ${c.dpe} DPE · ${c.public} PUBLIC</div></div>
-  <div class="qual-panel simple-table-panel"><div class="simple-table-head"><div><h3>Tableau des ventes analysées</h3><div class="subtxt"></div></div><div class="simple-head-actions"><span id="qualVisibleCount" class="visible-count">${rows.length} / ${state.qual.rows.length} ventes affichées</span><span id="simpleProgress" class="simple-progress-box">${simpleProgressText()}</span><button class="qual-secondary" onclick="enrichSimpleDetermination(true)">Actualiser depuis les sources</button></div></div><div id="simpleGlobalPrice">${simpleGlobalPriceHtml(rows)}</div>${filterBarHtml()}<div class="qual-table-wrap simple-table-wrap"><table class="qual-table simple-qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div></div>`;
+  <div class="qual-panel simple-table-panel"><div class="simple-table-head"><div><h3>Tableau des ventes analysées</h3><div class="subtxt">Le Prix global médian est calculé uniquement sur les ventes affichées que tu laisses cochées dans « Garder ».</div></div><div class="simple-head-actions"><span id="qualVisibleCount" class="visible-count">${rows.length} / ${state.qual.rows.length} ventes affichées</span><span id="simpleProgress" class="simple-progress-box">${simpleProgressText()}</span><button class="qual-secondary" onclick="enrichSimpleDetermination(true)">Actualiser depuis les sources</button></div></div><div id="simpleGlobalPrice">${simpleGlobalPriceHtml(rows)}</div>${filterBarHtml()}<div class="qual-table-wrap simple-table-wrap"><table class="qual-table simple-qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div><div class="qual-warn"><b>Données stabilisées :</b> les enrichissements DPE / BDNB / RNIC / OSM / AUDIT sont réutilisés lorsqu’ils sont déjà fiabilisés. Si tu relances une nouvelle analyse, les recherches de l’analyse précédente sont immédiatement abandonnées et la priorité passe au nouveau jeu de ventes.</div></div>`;
   if(state.view==='qualifies'&&!state.qual.simpleStarted&&!state.qual.running){state.qual.simpleStarted=true;setTimeout(()=>enrichSimpleDetermination(false),40);}
 };
 
@@ -3258,7 +3439,7 @@ function updateFullProgress(dpeDone,dpeTotal,pubDone,pubTotal,audDone,audTotal){
 
 qualifiedTableHtml=function(rows){
   const showFloor=shouldShowFloor(),cols=showFloor?20:19;let h=`<thead><tr><th class="keep-head">Garder</th>${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${showFloor?qualHeader('floor','Étage'):''}<th>Fiabilité</th>${qualHeader('copro','Copro')}${qualHeader('terrain','Terrain','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;
-  rows.forEach(r=>{const di=r.dpeInfo,b=simpleWorkBudget(r),keep=priceRowIsKept(r),sk=encodeURIComponent(stableRowId(r));h+=`<tr data-sync-key="${sk}" class="${keep?'price-kept':'price-excluded'} ${state.qual.mapFocusKey===sk?'sync-focus':''}" onmouseenter="syncTableHover('${sk}',true)" onmouseleave="syncTableHover('${sk}',false)"><td class="keep-head"><input class="price-keep" type="checkbox" ${keep?'checked':''} onchange="togglePriceKeep('${encodeURIComponent(rowKey(r))}')" title="Inclure ce bien dans le Prix global médian"></td><td>${r.date||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td>${showFloor?`<td>${floorLabel(di?.floor)}</td>`:''}<td>${reliabilityHtml(r)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td></td><td></td><td class="num">${isFinite(b.value)&&b.value>0?`<b>${eur(b.value)}</b><span class="conf">${b.source==='audit'?'travaux énergétiques préconisés · audit certain':'saisie manuelle'}</span>`:(b.source==='audit_unconfirmed'?`<span class="conf low"><b>À confirmer</b><br>audit non suffisamment rapproché</span>`:'—')}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;});
+  rows.forEach(r=>{const di=r.dpeInfo,b=simpleWorkBudget(r),keep=priceRowIsKept(r),sk=encodeURIComponent(stableRowId(r));h+=`<tr data-sync-key="${sk}" class="${keep?'price-kept':'price-excluded'} ${state.qual.mapFocusKey===sk?'sync-focus':''}" onmouseenter="syncTableHover('${sk}',true)" onmouseleave="syncTableHover('${sk}',false)"><td class="keep-head"><input class="price-keep" type="checkbox" ${keep?'checked':''} onchange="togglePriceKeep('${encodeURIComponent(rowKey(r))}')" title="Inclure ce bien dans le Prix global médian"></td><td>${r.date||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td>${showFloor?`<td>${floorLabel(di?.floor)}</td>`:''}<td>${reliabilityHtml(r)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td>${simpleWorksCellHtml(r)}</td><td class="num">${isFinite(b.value)&&b.value>0?`<b>${eur(b.value)}</b><span class="conf">${b.source==='audit'?'travaux énergétiques préconisés · audit certain':'saisie manuelle'}</span>`:(b.source==='audit_unconfirmed'?`<span class="conf low"><b>À confirmer</b><br>audit non suffisamment rapproché</span>`:'—')}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;});
   if(!rows.length)h+=`<tr><td colspan="${cols}" style="padding:28px;text-align:center"><b>Aucune vente ne correspond aux filtres actuels.</b><br><span class="conf" style="display:block;margin-top:6px">Clique « Réinitialiser » pour afficher toutes les ventes de l’analyse.</span></td></tr>`;return h+'</tbody>';
 };
 
@@ -3288,10 +3469,10 @@ function exportFinalSelection(){
 }
 
 refreshQualifiedView=function(){
-  const current=normalizeManualFilterState(state.qual.filters||{});state.qual.filters={dpe:getCheckedValues('qfDpe',current.dpe),pieces:getCheckedValues('qfPieces',current.pieces),constructionMin:document.getElementById('qfConstructionMin')?.value??current.constructionMin,constructionMax:document.getElementById('qfConstructionMax')?.value??current.constructionMax,floor:document.getElementById('qfFloor')?.value||'all',copro:document.getElementById('qfCopro')?.value||'all',terrain:document.getElementById('qfTerrain')?.value||'all';
-  // Update pill colors
-  document.querySelectorAll('input[name="qfDpe"],input[name="qfPieces"]').forEach(inp=>{const lbl=inp.closest('label');if(!lbl)return;if(inp.checked){lbl.style.border='1.5px solid #7D721A';lbl.style.background='#F7F4E6';lbl.style.color='#7D721A';}else{lbl.style.border='1.5px solid #E5E4DF';lbl.style.background='#fff';lbl.style.color='#3A3A36';}})};
+  const current=normalizeManualFilterState(state.qual.filters||{});state.qual.filters={dpe:getCheckedValues('qfDpe',current.dpe),pieces:getCheckedValues('qfPieces',current.pieces),constructionMin:document.getElementById('qfConstructionMin')?.value??current.constructionMin,constructionMax:document.getElementById('qfConstructionMax')?.value??current.constructionMax,floor:document.getElementById('qfFloor')?.value||'all',copro:document.getElementById('qfCopro')?.value||'all',terrain:document.getElementById('qfTerrain')?.value||'all'};
   const rows=qualifiedFilteredRows(true),tbl=document.getElementById('qualTable');if(tbl)tbl.innerHTML=qualifiedTableHtml(rows);const c=document.getElementById('qualVisibleCount');if(c)c.textContent=`${rows.length} / ${state.qual.rows.length} ventes affichées`;const gp=document.getElementById('simpleGlobalPrice');if(gp)gp.innerHTML=simpleGlobalPriceHtml(rows);drawMutations();if(state.view==='comparateur')renderComparator();
+  // Update pill colors on filter change
+  document.querySelectorAll('input[name="qfDpe"],input[name="qfPieces"]').forEach(function(inp){var lbl=inp.closest('label');if(!lbl)return;if(inp.checked){lbl.style.border='1.5px solid #7D721A';lbl.style.background='#F7F4E6';lbl.style.color='#7D721A';}else{lbl.style.border='1.5px solid #E5E4DF';lbl.style.background='#fff';lbl.style.color='#3A3A36';}});
 };
 
 togglePriceKeep=function(encoded){const k=decodeURIComponent(encoded),r=(state.qual.rows||[]).find(x=>rowKey(x)===k);if(!r)return;r.priceSelected=!priceRowIsKept(r);refreshQualifiedView();};
@@ -3299,7 +3480,7 @@ setDisplayedPriceSelection=function(on){qualifiedFilteredRows(false).forEach(r=>
 
 renderQualifiedResults=function(){
   const body=document.getElementById('qualBody');if(!body)return;if(!state.qual.rows.length){renderQualifiedBase();return;}const source=qualifiedSourceRows();if(source.length!==state.qual.rows.length||source.some((r,i)=>rowKey(r)!==rowKey(state.qual.rows[i]))){state.qual.simpleStarted=false;renderQualifiedBase();return;}const rows=qualifiedFilteredRows(true),c=simpleEnrichmentCounts();
-  body.innerHTML=`<div class="qual-hero simple-qual-hero"><div><h2>Détermination du prix</h2><p>Filtre les ventes, puis coche uniquement les biens que tu veux conserver dans le calcul du prix médian.</p></div><div class="qual-source">${c.total} VENTES · ${c.dpe} DPE · ${c.public} PUBLIC</div></div><div class="qual-panel simple-table-panel"><div class="simple-table-head"><div><h3>Tableau des ventes analysées</h3><div class="subtxt"></div></div><div class="decision-actions"><span id="qualVisibleCount" class="visible-count">${rows.length} / ${state.qual.rows.length} ventes affichées</span><button class="decision-btn" onclick="setView('carte')">Voir sur la carte</button><button class="decision-btn" onclick="setView('comparateur')">Comparer</button><button class="decision-btn" onclick="exportFinalSelection()">Exporter la sélection</button><button class="qual-secondary" onclick="enrichSimpleDetermination(true)">Actualiser depuis les sources</button></div></div><div id="simpleProgress" class="enrichment-progress">${fullProgressHtml()}</div><div id="simpleGlobalPrice">${simpleGlobalPriceHtml(rows)}</div>${filterBarHtml()}<div class="qual-table-wrap simple-table-wrap"><table class="qual-table simple-qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div></div>`;
+  body.innerHTML=`<div class="qual-hero simple-qual-hero"><div><h2>Détermination du prix</h2><p>Filtre les ventes, puis coche uniquement les biens que tu veux conserver dans le calcul du prix médian.</p></div><div class="qual-source">${c.total} VENTES · ${c.dpe} DPE · ${c.public} PUBLIC</div></div><div class="qual-panel simple-table-panel"><div class="simple-table-head"><div><h3>Tableau des ventes analysées</h3><div class="subtxt">Le Prix global médian est calculé uniquement sur les ventes affichées que tu laisses cochées dans « Garder ».</div></div><div class="decision-actions"><span id="qualVisibleCount" class="visible-count">${rows.length} / ${state.qual.rows.length} ventes affichées</span><button class="decision-btn" onclick="setView('carte')">Voir sur la carte</button><button class="decision-btn" onclick="setView('comparateur')">Comparer</button><button class="decision-btn" onclick="exportFinalSelection()">Exporter la sélection</button><button class="qual-secondary" onclick="enrichSimpleDetermination(true)">Actualiser depuis les sources</button></div></div><div id="simpleProgress" class="enrichment-progress">${fullProgressHtml()}</div><div id="simpleGlobalPrice">${simpleGlobalPriceHtml(rows)}</div>${filterBarHtml()}<div class="qual-table-wrap simple-table-wrap"><table class="qual-table simple-qual-table" id="qualTable">${qualifiedTableHtml(rows)}</table></div><div class="qual-warn"><b>Données stabilisées :</b> les enrichissements DPE / BDNB / RNIC / OSM / AUDIT sont réutilisés lorsqu’ils sont déjà fiabilisés. Si tu relances une nouvelle analyse, les recherches de l’analyse précédente sont immédiatement abandonnées et la priorité passe au nouveau jeu de ventes.</div></div>`;
   if(state.view==='qualifies'&&!state.qual.simpleStarted&&!state.qual.running){state.qual.simpleStarted=true;setTimeout(()=>enrichSimpleDetermination(false),40);}drawMutations();
 };
 
@@ -3325,100 +3506,6 @@ enrichSimpleDetermination=async function(force=false){
 /* ============================================================
    PATCH - sélection finale + filtres allégés + export PDF
    ============================================================ */
-
-/* Fonctions manquantes réinjectées */
-function editQualifiedTarget(){state.qual.rows=[];state.qual.targetPublic=null;state.qual.targetAudit=null;renderQualifiedBase();}
-
-
-
-
-/* =========================================================
-   DÉTERMINATION DU PRIX — MODE TABLEAU SIMPLE
-   Toutes les ventes conservées dans l'analyse sont affichées. Aucun score,
-   aucun Top 5 et aucun prix cible automatique : l'utilisateur
-   arbitre directement avec les filtres et les tris.
-   ========================================================= */
-
-function simpleEnrichmentCounts(){
-  const rows=state.qual.rows||[];return{
-    total:rows.length,
-    dpe:rows.filter(r=>r.dpeChecked).length,
-    public:rows.filter(r=>r.publicInfo?.done).length,
-    audit:rows.filter(r=>r.auditChecked).length
-  };
-}
-
-async function enrichSimpleDetermination(force=false){
-  if(state.qual.running||!state.qual.rows.length)return;
-  state.qual.simpleStarted=true;state.qual.running=true;
-  try{
-    const rows=state.qual.rows;
-    if(force){
-      clearRuntimeEnrichmentCaches();
-      rows.forEach(r=>{const locked=loadCoproDecision(r,r.publicInfo?.banId||r.dpeInfo?.banId||'');clearStableRow(r);r.dpeChecked=false;delete r.dpeInfo;r.publicInfo=locked?{done:false,osmChecked:false,coproDecision:locked,immat:locked.immat||'',immatSource:locked.source||'',errors:[]}:null;r.auditChecked=false;r.auditInfo=null;});
-    }
-    setStatus(`Tableau affiché · enrichissement DPE en arrière-plan (${rows.length} ventes)…`,'info');
-    const er=await enrichRowsDpe(rows,(d,n,e)=>{const info=document.getElementById('srcInfo');if(info)info.textContent=`DPE ADEME ${d}/${n}${e?' · '+e+' erreur(s)':''}…`;});
-    state.qual.dpeErrors=er.errors;state.qual.enrichedCount=rows.filter(r=>r.dpeInfo!=null).length;state.qual.enrichedAll=true;
-    renderQualifiedResults();
-    setStatus(`DPE chargé · enrichissement copropriété / équipements / travaux en parallèle…`,'info');
-    const [pe,ae]=await Promise.all([
-      enrichRowsPublic(rows,(d,n)=>{const info=document.getElementById('srcInfo');if(info)info.textContent=`BDNB / RNIC / OSM ${d}/${n}…`;}),
-      enrichAllAuditsSimple(rows,(d,n)=>{const el=document.getElementById('simpleProgress');if(el)el.textContent=`AUDIT ADEME ${d}/${n}…`;})
-    ]);
-    state.qual.publicErrors+=pe.errors;state.qual.auditErrors+=ae.errors;
-    state.qual.publicEnrichedCount=rows.filter(r=>r.publicInfo?.done).length;state.qual.publicEnrichedAll=state.qual.publicEnrichedCount>=rows.length;
-    state.qual.auditEnrichedCount=rows.filter(r=>r.auditChecked).length;state.qual.auditEnrichedAll=state.qual.auditEnrichedCount>=rows.length;
-    renderQualifiedResults();
-    const c=simpleEnrichmentCounts();
-    setStatus(`Tableau enrichi : ${c.total} ventes · ${c.dpe} DPE · ${c.public} données bâtiment/copro/OSM · ${c.audit} audits vérifiés.`,'ok');
-  }catch(e){console.error(e);setStatus('Enrichissement du tableau : '+e.message,'err');}
-  finally{state.qual.running=false;}
-}
-
-function simpleWorkBudget(r){
-  const m=manualWorkBudget(r);if(isFinite(m))return{value:m,source:'manual',confirmed:true};
-  const a=r?.auditInfo;
-  // Un montant AUDIT n'est affiché comme exploitable que si le rapprochement
-  // adresse + surface + temporalité est classé "high".
-  if(a&&isFinite(a.costMid)&&a.costMid>0){
-    if(a.confidence==='high')return{value:a.costMid,source:'audit',confirmed:true};
-    return{value:NaN,source:'audit_unconfirmed',confirmed:false,rawValue:a.costMid};
-  }
-  return{value:NaN,source:a?'audit_no_cost':'none',confirmed:false};
-}
-
-function simpleWorksCellHtml(r){
-  const a=r?.auditInfo,b=simpleWorkBudget(r),e=energyWorksInfo(r),chips=[];
-  if(a){
-    const certain=a.confidence==='high';
-    chips.push(`<span class="work-pill ${certain?'audit':'unknown'}">${certain?'Audit ADEME rapproché':'Audit ADEME possible'}</span>`);
-    if(a?.works?.length&&certain)chips.push(`<span class="work-pill audit">${esc(a.works[0])}</span>`);
-    if(b.source==='audit'&&isFinite(b.value)&&b.value>0)chips.push(`<span class="work-pill audit">Travaux préconisés · ${eur(b.value)}</span>`);
-    else if(b.source==='audit_unconfirmed')chips.push(`<span class="work-pill unknown">Budget à confirmer</span>`);
-  }else{
-    chips.push(`<span class="work-pill ${e.cls}">${esc(e.label)}</span>`);
-  }
-  return `<div class="work-stack"><div class="work-line">${chips.join('')}</div>${a?.date?`<span class="work-sub">Audit du ${esc(a.date)} · ${confidenceLabel(a.confidence)}${a.confidence!=='high'?' · montant non retenu':''}</span>`:''}<button class="work-edit" onclick="openWorkModal('${encodeURIComponent(rowKey(r))}')">✎ Détails travaux</button></div>`;
-}
-
-async function enrichAllAuditsSimple(rows,progress){
-  const todo=rows.filter(r=>!r.auditChecked);let done=0,errors=0,cursor=0;
-  async function worker(){while(cursor<todo.length){const r=todo[cursor++];try{r.auditInfo=await lookupAuditForRow(r);r.auditChecked=true;saveStableRow(r);}catch(e){errors++;r.auditInfo=null;r.auditChecked=false;}done++;progress?.(done,todo.length,errors);await sleep(150);}}
-  await Promise.all(Array.from({length:Math.min(3,todo.length)},worker));return{count:todo.length,errors};
-}
-
-function toggleQualified(encoded){const k=decodeURIComponent(encoded),r=state.qual.rows.find(x=>rowKey(x)===k);if(!r)return;r.qSelected=!r.qSelected;renderQualifiedResults();}
-
-function simpleEnrichmentCounts(){
-  const rows=state.qual.rows||[];return{
-    total:rows.length,
-    dpe:rows.filter(r=>r.dpeChecked).length,
-    public:rows.filter(r=>r.publicInfo?.done).length,
-    audit:rows.filter(r=>r.auditChecked).length
-  };
-}
-
 
 /* Plus de filtre Année de construction. */
 filterBarHtml=function(){
@@ -3474,7 +3561,7 @@ qualifiedTableHtml=function(rows){
   let h=`<thead><tr><th class="keep-head"><label class="keep-all-wrap" title="Tout sélectionner / désélectionner dans les ventes affichées"><input id="keepAllDisplayed" type="checkbox" onchange="toggleAllDisplayedFromHeader(this.checked)"><span>Garder</span></label></th>${qualHeader('date','Date')}${qualHeader('distance','Distance','num')}${qualHeader('type','Type')}${qualHeader('surface','Surface','num')}${qualHeader('pieces','Pièces','num')}${qualHeader('dpe','DPE')}${qualHeader('construction','Construction')}${showFloor?qualHeader('floor','Étage'):''}<th>Fiabilité</th>${qualHeader('copro','Copropriété')}${qualHeader('terrain','Terrain','num')}${qualHeader('val','Prix vendu','num')}${qualHeader('mutation','Mutation')}${qualHeader('voie','Adresse')}<th>Sources</th></tr></thead><tbody>`;
   rows.forEach(r=>{
     const di=r.dpeInfo,keep=priceRowIsKept(r),sk=encodeURIComponent(stableRowId(r));
-    h+=`<tr data-sync-key="${sk}" class="${keep?'price-kept':'price-excluded'} ${state.qual.mapFocusKey===sk?'sync-focus':''}" onmouseenter="syncTableHover('${sk}',true)" onmouseleave="syncTableHover('${sk}',false)"><td class="keep-head"><input class="price-keep" type="checkbox" ${keep?'checked':''} onchange="togglePriceKeep('${encodeURIComponent(rowKey(r))}')" title="Inclure ce bien dans le Prix global médian"></td><td>${r.date||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td>${showFloor?`<td>${floorLabel(di?.floor)}</td>`:''}<td>${reliabilityHtml(r)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td></td><td></td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;
+    h+=`<tr data-sync-key="${sk}" class="${keep?'price-kept':'price-excluded'} ${state.qual.mapFocusKey===sk?'sync-focus':''}" onmouseenter="syncTableHover('${sk}',true)" onmouseleave="syncTableHover('${sk}',false)"><td class="keep-head"><input class="price-keep" type="checkbox" ${keep?'checked':''} onchange="togglePriceKeep('${encodeURIComponent(rowKey(r))}')" title="Inclure ce bien dans le Prix global médian"></td><td>${r.date||'—'}</td><td class="num">${isFinite(r.dist)?f0(r.dist)+' m':'—'}${microLocationHtml(r)}</td><td>${esc(r.type)}</td><td class="num">${r.surface>0?f0(r.surface)+' m²':'—'}</td><td class="num">${isFinite(r.pieces)?r.pieces:'—'}</td><td>${dpeBadge(di?.dpe)}<span class="conf ${di?.confidence||''}">${confidenceLabel(di?.confidence)}</span></td><td>${periodLabel(di?.period)}${isFinite(di?.year)?`<span class="conf">${di.year}</span>`:''}</td>${showFloor?`<td>${floorLabel(di?.floor)}</td>`:''}<td>${reliabilityHtml(r)}</td><td>${coproCell(r)}</td><td class="num">${r.terrain>0?f0(r.terrain)+' m²':'—'}</td><td>${simpleWorksCellHtml(r)}</td><td class="num"><b>${eur(r.val)}</b></td><td class="num"><b>${ppmF(r.ppm)}</b></td><td>${mutationBadgeHtml(r)}</td><td>${addrLink(r)}</td><td>${publicDetailsButton(r)}</td></tr>`;
   });
   if(!rows.length)h+=`<tr><td colspan="${cols}" style="padding:28px;text-align:center"><b>Aucune vente ne correspond aux filtres actuels.</b><br><span class="conf" style="display:block;margin-top:6px">Clique « Réinitialiser » pour afficher toutes les ventes de l’analyse.</span></td></tr>`;
   return h+'</tbody>';
@@ -3484,8 +3571,8 @@ qualifiedTableHtml=function(rows){
 const _simpleGlobalPriceHtmlSelectionPdf=simpleGlobalPriceHtml;
 simpleGlobalPriceHtml=function(rows){
   return _simpleGlobalPriceHtmlSelectionPdf(rows)
-    .replace('✓ Garder tous les biens affichés','✓ Tout garder')
-    .replace('× Tout retirer','× Tout retirer');
+    .replace('✓ Garder tous les biens affichés','✓ Tout sélectionner')
+    .replace('× Tout retirer','× Tout désélectionner');
 };
 
 refreshQualifiedView=function(){
